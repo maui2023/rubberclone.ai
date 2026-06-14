@@ -12,3 +12,8 @@ define('DB_PASS', 'password_anda');
 // Kunci Rahsia JWT untuk token keselamatan
 define('JWT_SECRET', 'kunci_rahsia_jwt_anda_di_sini_12345!');
 define('JWT_EXPIRY', 86400 * 7); // Sah selama 7 hari
+
+// Kredensial Pentadbir Lalai (Digunakan untuk seeding automatik jika DB kosong)
+define('ADMIN_EMAIL', 'admin@demo.com');
+define('ADMIN_PASS', 'admin123');
+define('ADMIN_USERNAME', 'admin_demo');

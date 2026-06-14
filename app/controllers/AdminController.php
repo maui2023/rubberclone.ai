@@ -224,17 +224,19 @@ class AdminController extends Controller {
             $total = $stmt->fetch()['total'];
 
             if ($total == 0) {
-                // Tiada pengguna dalam DB, cipta pentadbir lalai: admin@demo.com / admin123
-                $adminData = [
-                    'email' => 'admin@demo.com',
-                    'username' => 'admin_demo',
-                    'password' => 'admin123',
-                    'fullname' => 'Pentadbir Utama RISDA',
-                    'agency' => 'RISDA Ibu Pejabat',
-                    'role' => 'admin',
-                    'status' => 'active'
-                ];
-                $this->userModel->create($adminData);
+                // Cipta pentadbir lalai menggunakan ketetapan daripada fail konfigurasi
+                if (defined('ADMIN_EMAIL') && defined('ADMIN_PASS') && defined('ADMIN_USERNAME')) {
+                    $adminData = [
+                        'email' => ADMIN_EMAIL,
+                        'username' => ADMIN_USERNAME,
+                        'password' => ADMIN_PASS,
+                        'fullname' => 'Pentadbir Utama RISDA',
+                        'agency' => 'RISDA Ibu Pejabat',
+                        'role' => 'admin',
+                        'status' => 'active'
+                    ];
+                    $this->userModel->create($adminData);
+                }
                 
                 // Tambah sedikit mock data imbasan daun getah untuk paparan peta & carta yang menarik
                 $userId = 1; // Admin user id

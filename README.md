@@ -237,7 +237,7 @@ Sistem ini dibina berasaskan corak reka bentuk MVC ringkas di mana semua laluan 
      ```
    * Pastikan direktori utama (Document Root) hos maya (Virtual Host) anda dihalakan ke folder `public/`.
 
-5. **Akses Sistem**:
+ 5. **Akses Sistem**:
    * Lawati `/pentadbir` untuk membuka Papan Pemuka Pentadbir.
    * Akaun Pentadbir Lalai (Auto-Generated jika jadual kosong):
      * **E-mel**: `admin@demo.com`

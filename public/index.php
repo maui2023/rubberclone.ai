@@ -40,11 +40,11 @@ spl_autoload_register(function ($class) {
 if (!function_exists('route')) {
     function route($path) {
         $cleanPath = ltrim($path, '/');
-        $useFallback = (defined('DISABLE_CLEAN_URLS') && DISABLE_CLEAN_URLS) || (strpos($_SERVER['REQUEST_URI'], 'index.php') !== false);
-        if ($useFallback) {
-            return '/index.php?url=' . $cleanPath;
+        $useCleanUrls = defined('ENABLE_CLEAN_URLS') && ENABLE_CLEAN_URLS;
+        if ($useCleanUrls) {
+            return '/' . $cleanPath;
         }
-        return '/' . $cleanPath;
+        return '/index.php?url=' . $cleanPath;
     }
 }
 

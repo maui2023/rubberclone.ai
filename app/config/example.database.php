@@ -18,5 +18,5 @@ define('ADMIN_EMAIL', 'admin@demo.com');
 define('ADMIN_PASS', 'admin123');
 define('ADMIN_USERNAME', 'admin_demo');
 
-// Tetapan Routing Fallback (Tetapkan true jika pelayan web/Nginx tiada mod URL rewrite)
-define('DISABLE_CLEAN_URLS', false);
+// Tetapan Routing Cantik (Tetapkan true jika pelayan web/Nginx menyokong peraturan URL rewrite)
+define('ENABLE_CLEAN_URLS', false);

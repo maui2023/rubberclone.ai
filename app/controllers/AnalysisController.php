@@ -88,35 +88,58 @@ class AnalysisController extends Controller {
         if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
             $fileTmpPath = $_FILES['image']['tmp_path'] ?? $_FILES['image']['tmp_name'];
             $fileName = $_FILES['image']['name'];
+            $fileSize = $_FILES['image']['size'];
             $fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
 
             $allowedExtensions = ['jpg', 'jpeg', 'png', 'webp'];
-            if (in_array($fileExtension, $allowedExtensions)) {
-                // Folder penyimpanan imej
-                $uploadDir = __DIR__ . '/../../public/uploads/';
-                if (!is_dir($uploadDir)) {
-                    mkdir($uploadDir, 0755, true);
-                }
+            $allowedMimeTypes = ['image/jpeg', 'image/png', 'image/webp'];
 
-                $newFileName = 'scan_' . $recordId . '.' . $fileExtension;
-                $destPath = $uploadDir . $newFileName;
+            // 1. Validasi Kaedah Muat Naik POST
+            if (!is_uploaded_file($fileTmpPath)) {
+                $this->analysisModel->delete($recordId, $user['id'], true);
+                $this->jsonResponse(["status" => "error", "message" => "Ralat pemprosesan fail muat naik."], 400);
+            }
 
-                if (move_uploaded_file($fileTmpPath, $destPath)) {
-                    // Bina URL penuh imej
-                    $host = $_SERVER['HTTP_HOST'];
-                    $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
-                    $imageUrl = $protocol . "://" . $host . "/uploads/" . $newFileName;
+            // 2. Validasi Saiz Fail (Had Maksimum 5MB)
+            if ($fileSize > 5 * 1024 * 1024) {
+                $this->analysisModel->delete($recordId, $user['id'], true);
+                $this->jsonResponse(["status" => "error", "message" => "Saiz fail melebihi had maksimum yang dibenarkan (5MB)."], 400);
+            }
 
-                    // Kemas kini URL imej dalam DB
-                    $database = new Database();
-                    $db = $database->getConnection();
-                    $stmt = $db->prepare("UPDATE analysis_records SET image_url = :image_url WHERE id = :id");
-                    $stmt->bindParam(':image_url', $imageUrl);
-                    $stmt->bindParam(':id', $recordId);
-                    $stmt->execute();
+            // 3. Validasi Jenis MIME Sebenar (OWASP File Upload Security)
+            $mimeType = mime_content_type($fileTmpPath);
+            if (!in_array($mimeType, $allowedMimeTypes) || !in_array($fileExtension, $allowedExtensions)) {
+                $this->analysisModel->delete($recordId, $user['id'], true);
+                $this->jsonResponse(["status" => "error", "message" => "Format fail tidak sah. Hanya imej JPG, PNG, dan WebP sahaja dibenarkan."], 400);
+            }
 
-                    $data['image_url'] = $imageUrl;
-                }
+            // Folder penyimpanan imej
+            $uploadDir = __DIR__ . '/../../public/uploads/';
+            if (!is_dir($uploadDir)) {
+                mkdir($uploadDir, 0755, true);
+            }
+
+            $newFileName = 'scan_' . $recordId . '.' . $fileExtension;
+            $destPath = $uploadDir . $newFileName;
+
+            if (move_uploaded_file($fileTmpPath, $destPath)) {
+                // Bina URL penuh imej
+                $host = $_SERVER['HTTP_HOST'];
+                $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
+                $imageUrl = $protocol . "://" . $host . "/uploads/" . $newFileName;
+
+                // Kemas kini URL imej dalam DB
+                $database = new Database();
+                $db = $database->getConnection();
+                $stmt = $db->prepare("UPDATE analysis_records SET image_url = :image_url WHERE id = :id");
+                $stmt->bindParam(':image_url', $imageUrl);
+                $stmt->bindParam(':id', $recordId);
+                $stmt->execute();
+
+                $data['image_url'] = $imageUrl;
+            } else {
+                $this->analysisModel->delete($recordId, $user['id'], true);
+                $this->jsonResponse(["status" => "error", "message" => "Gagal menyimpan fail muat naik di pelayan."], 500);
             }
         }
 

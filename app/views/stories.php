@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Laporan Lapangan & Kisah Kejayaan - Rubber Clone AI. Cerita dan rujukan agronomi tapak semaian getah RISDA.">
-    <title>Laporan Lapangan & Kisah Kejayaan - Rubber Clone AI</title>
+    <meta name="description" content="Laporan Lapangan & Kisah Kejayaan - RISDA BESUT. Cerita dan rujukan agronomi tapak semaian getah.">
+    <title>Laporan Lapangan & Kisah Kejayaan - RISDA BESUT</title>
     <link rel="stylesheet" href="/styles.css">
     <style>
         :root {
@@ -167,13 +167,9 @@
     <!-- Header & Navigation -->
     <header class="header-nav" id="main-header">
         <div class="nav-container">
-            <a href="<?php echo route(''); ?>" class="logo" id="brand-logo" aria-label="Laman Utama Rubber Clone AI">
-                <svg class="logo-leaf" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 3.5 1 9.8a7 7 0 0 1-9 8.2z"></path>
-                    <path d="M9 22v-4h4"></path>
-                </svg>
-                <span class="logo-brand">RubberClone<span style="color: var(--color-gold-latex);">AI</span></span>
-                <span class="logo-tag">RISDA</span>
+            <a href="<?php echo route(''); ?>" class="logo" id="brand-logo" aria-label="Laman Utama Rubber Clone AI" style="display: flex; align-items: center; gap: 10px;">
+                <img src="/public/assets/images/risda_logo.jpg" alt="RISDA Logo" style="width: 38px; height: 38px; border-radius: 50%; border: 1.5px solid var(--color-gold-latex);">
+                <span class="logo-brand">RISDA <span style="color: var(--color-gold-latex);">BESUT</span></span>
             </a>
             <nav class="nav-links" id="navigation-menu">
                 <a href="<?php echo route(''); ?>" class="nav-link">Laman Utama</a>

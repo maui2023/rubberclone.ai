@@ -165,21 +165,32 @@ let allUsers = [];
 function initUsersDirectory() {
     const tableBody = document.getElementById('users-table-body');
     const searchInput = document.getElementById('search-users-input');
+    const modal = document.getElementById('add-user-modal');
+    const btnAddUser = document.getElementById('btn-add-user');
+    const btnCloseModal = document.getElementById('btn-close-modal');
+    const addUserForm = document.getElementById('add-user-form');
+    const errorDiv = document.getElementById('add-user-error');
+    const btnSubmit = document.getElementById('btn-submit-add-user');
 
-    // Mengambil data senarai pengguna
-    fetch(getApiUrl('api/admin/users'))
-        .then(response => response.json())
-        .then(res => {
-            if (res.status === 'success') {
-                allUsers = res.data;
-                renderUsersTable(allUsers);
-            } else {
-                tableBody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:#ef4444;">${res.message}</td></tr>`;
-            }
-        })
-        .catch(err => {
-            tableBody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:#ef4444;">Ralat sambungan pelayan.</td></tr>`;
-        });
+    // Mengambil data senarai pengguna secara dinamik
+    function fetchAndRenderUsers() {
+        tableBody.innerHTML = `<tr><td colspan="7" class="table-loading-row"><span class="spinner"></span> Memuatkan rekod pendaftaran pengguna...</td></tr>`;
+        fetch(getApiUrl('api/admin/users'))
+            .then(response => response.json())
+            .then(res => {
+                if (res.status === 'success') {
+                    allUsers = res.data;
+                    renderUsersTable(allUsers);
+                } else {
+                    tableBody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:#ef4444;">${res.message}</td></tr>`;
+                }
+            })
+            .catch(err => {
+                tableBody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:#ef4444;">Ralat sambungan pelayan.</td></tr>`;
+            });
+    }
+
+    fetchAndRenderUsers();
 
     // Carian pengguna masa nyata
     searchInput.addEventListener('input', function () {
@@ -192,6 +203,77 @@ function initUsersDirectory() {
         );
         renderUsersTable(filtered);
     });
+
+    // Urus Modal Tunjuk/Sembunyi
+    if (btnAddUser && modal) {
+        btnAddUser.addEventListener('click', () => {
+            modal.style.display = 'flex';
+            errorDiv.style.display = 'none';
+            addUserForm.reset();
+        });
+    }
+
+    if (btnCloseModal && modal) {
+        btnCloseModal.addEventListener('click', () => {
+            modal.style.display = 'none';
+        });
+        
+        // Klik luar modal untuk tutup
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
+    }
+
+    // Urus Hantar Borang (Submit Form)
+    if (addUserForm) {
+        addUserForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+            
+            const formData = {
+                fullname: document.getElementById('reg-fullname').value,
+                username: document.getElementById('reg-username').value,
+                email: document.getElementById('reg-email').value,
+                password: document.getElementById('reg-password').value,
+                agency: document.getElementById('reg-agency').value,
+                role: document.getElementById('reg-role').value,
+                status: document.getElementById('reg-status').value
+            };
+
+            errorDiv.style.display = 'none';
+            btnSubmit.disabled = true;
+            btnSubmit.innerHTML = 'Mendaftarkan...';
+
+            fetch(getApiUrl('api/admin/create_user'), {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => response.json())
+            .then(res => {
+                btnSubmit.disabled = false;
+                btnSubmit.innerHTML = 'Daftar Pengguna';
+                
+                if (res.status === 'success') {
+                    modal.style.display = 'none';
+                    addUserForm.reset();
+                    fetchAndRenderUsers();
+                } else {
+                    errorDiv.innerText = res.message;
+                    errorDiv.style.display = 'block';
+                }
+            })
+            .catch(err => {
+                btnSubmit.disabled = false;
+                btnSubmit.innerHTML = 'Daftar Pengguna';
+                errorDiv.innerText = 'Ralat sambungan pelayan. Sila cuba lagi.';
+                errorDiv.style.display = 'block';
+            });
+        });
+    }
 }
 
 function renderUsersTable(usersList) {

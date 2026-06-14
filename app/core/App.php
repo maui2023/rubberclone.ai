@@ -34,6 +34,7 @@ class App {
             'api/admin/update_cms'  => ['AdminController', 'updateCms', 'POST'],
             'api/admin/blog/create' => ['AdminController', 'createBlogPost', 'POST'],
             'api/admin/blog/delete' => ['AdminController', 'deleteBlogPost', 'DELETE'],
+            'api/admin/create_user' => ['AdminController', 'createUser', 'POST'],
             
             // 4. Halaman Web Portal Pentadbir (Admin Web Views)
             'pentadbir'             => ['AdminController', 'dashboard', 'GET'],

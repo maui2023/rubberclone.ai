@@ -394,4 +394,82 @@ class AdminController extends Controller {
             $this->jsonResponse(["status" => "error", "message" => "Gagal memadam kisah blog."], 500);
         }
     }
+
+    // Cipta Pengguna Baharu oleh Admin (POST /api/admin/create_user)
+    public function createUser() {
+        // Hanya admin boleh akses
+        $this->checkApiAuth();
+
+        $input = json_decode(file_get_contents('php://input'), true);
+        if (!$input) {
+            $this->jsonResponse(["status" => "error", "message" => "Format data input tidak sah."], 400);
+        }
+
+        // Ujian kesahihan input wajib
+        $requiredFields = ['email', 'username', 'password', 'fullname'];
+        foreach ($requiredFields as $field) {
+            if (empty($input[$field]) || !is_string($input[$field])) {
+                $this->jsonResponse(["status" => "error", "message" => "Medan '$field' adalah wajib dan mestilah dalam format teks."], 400);
+            }
+        }
+
+        // 1. Validasi Format E-mel (OWASP A03:2021)
+        $email = trim($input['email']);
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $this->jsonResponse(["status" => "error", "message" => "Format alamat e-mel tidak sah."], 400);
+        }
+
+        // 2. Semak Had Panjang & Kekuatan Kata Laluan
+        $password = $input['password'];
+        if (strlen($password) < 8) {
+            $this->jsonResponse(["status" => "error", "message" => "Kata laluan mestilah sekurang-kurangnya 8 aksara."], 400);
+        }
+
+        // 3. Sanitasi Input Teks untuk Mencegah Serangan XSS (OWASP A03:2021)
+        $username = trim(htmlspecialchars(strip_tags($input['username']), ENT_QUOTES, 'UTF-8'));
+        $fullname = trim(htmlspecialchars(strip_tags($input['fullname']), ENT_QUOTES, 'UTF-8'));
+        $agency = isset($input['agency']) ? trim(htmlspecialchars(strip_tags($input['agency']), ENT_QUOTES, 'UTF-8')) : 'RISDA Pekebun Kecil';
+        $role = isset($input['role']) ? trim(htmlspecialchars(strip_tags($input['role']), ENT_QUOTES, 'UTF-8')) : 'user';
+        $status = isset($input['status']) ? trim(htmlspecialchars(strip_tags($input['status']), ENT_QUOTES, 'UTF-8')) : 'active';
+
+        // Validasi aksara Username (hanya alfanumerik dan underscore dibenarkan)
+        if (!preg_match('/^[a-zA-Z0-9_]{3,30}$/', $username)) {
+            $this->jsonResponse(["status" => "error", "message" => "Nama pengguna (username) hanya boleh mengandungi huruf, nombor, garis bawah (_) dan panjang antara 3 hingga 30 aksara."], 400);
+        }
+
+        // Validasi peranan (role)
+        if ($role !== 'admin' && $role !== 'user') {
+            $this->jsonResponse(["status" => "error", "message" => "Peranan pengguna tidak sah."], 400);
+        }
+
+        // Validasi status
+        if ($status !== 'active' && $status !== 'inactive') {
+            $this->jsonResponse(["status" => "error", "message" => "Status pengguna tidak sah."], 400);
+        }
+
+        // Semak kewujudan e-mel pendua
+        if ($this->userModel->getByEmail($email)) {
+            $this->jsonResponse(["status" => "error", "message" => "Alamat e-mel ini telah berdaftar dalam sistem."], 400);
+        }
+
+        // Sediakan data tersanitasi
+        $userData = [
+            'email' => $email,
+            'username' => $username,
+            'password' => $password,
+            'fullname' => $fullname,
+            'agency' => $agency,
+            'role' => $role,
+            'status' => $status
+        ];
+
+        // Proses pendaftaran
+        $userId = $this->userModel->create($userData);
+
+        if ($userId) {
+            $this->jsonResponse(["status" => "success", "message" => "Pengguna baharu berjaya didaftarkan."]);
+        } else {
+            $this->jsonResponse(["status" => "error", "message" => "Ralat pelayan semasa mendaftar akaun."], 500);
+        }
+    }
 }

@@ -20,12 +20,10 @@
         <div class="login-card">
             
             <!-- Logo Header -->
-            <header class="login-header">
-                <svg class="login-logo-icon" width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 3.5 1 9.8a7 7 0 0 1-9 8.2z"></path>
-                </svg>
-                <h1 class="login-brand-title">RubberClone<span style="color: var(--color-gold-latex);">AI</span></h1>
-                <p class="login-subtitle">Sistem Pemantauan & Papan Pemuka RISDA</p>
+            <header class="login-header" style="text-align: center; margin-bottom: 2rem;">
+                <img src="/public/assets/images/risda_logo.jpg" alt="RISDA Logo" style="width: 80px; height: 80px; border-radius: 50%; border: 2px solid var(--color-gold-latex); margin-bottom: 1rem;">
+                <h1 class="login-brand-title" style="font-size: 1.6rem; margin: 0; font-family: 'Outfit', sans-serif;">Sistem Pengecaman Klon Pokok Getah</h1>
+                <p class="login-subtitle" style="color: var(--color-gold-latex); font-weight: bold; margin-top: 0.2rem; font-size: 1.1rem; letter-spacing: 1px;">RISDA BESUT</p>
             </header>
 
             <!-- Paparan Ralat -->

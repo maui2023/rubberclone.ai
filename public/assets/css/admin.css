@@ -889,3 +889,19 @@ input:checked + .slider:before {
         grid-template-columns: 1fr !important;
     }
 }
+
+/* --- STYLES FOR ADD USER MODAL --- */
+#add-user-modal input:focus, #add-user-modal select:focus {
+    outline: none;
+    border-color: var(--color-emerald) !important;
+    box-shadow: 0 0 10px var(--color-emerald-glow) !important;
+}
+
+#btn-close-modal:hover {
+    color: var(--color-emerald) !important;
+}
+
+#btn-add-user:hover {
+    background: var(--color-emerald-hover) !important;
+    transform: translateY(-1px);
+}

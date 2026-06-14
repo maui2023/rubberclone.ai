@@ -1,6 +1,16 @@
 <?php
 // app/views/layouts/header.php
 $active_tab = $active_tab ?? 'dashboard';
+
+if (!function_exists('route')) {
+    function route($path) {
+        $cleanPath = ltrim($path, '/');
+        if (strpos($_SERVER['REQUEST_URI'], 'index.php') !== false) {
+            return '/index.php?url=' . $cleanPath;
+        }
+        return '/' . $cleanPath;
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="ms">
@@ -34,7 +44,7 @@ $active_tab = $active_tab ?? 'dashboard';
             </div>
             
             <nav class="sidebar-menu" aria-label="Menu Pentadbir">
-                <a href="/pentadbir" class="menu-item <?php echo $active_tab === 'dashboard' ? 'active' : ''; ?>">
+                <a href="<?php echo route('pentadbir'); ?>" class="menu-item <?php echo $active_tab === 'dashboard' ? 'active' : ''; ?>">
                     <!-- Grid Icon SVG -->
                     <svg class="menu-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <rect x="3" y="3" width="7" height="7"></rect>
@@ -45,7 +55,7 @@ $active_tab = $active_tab ?? 'dashboard';
                     Papan Pemuka
                 </a>
                 
-                <a href="/admin/users" class="menu-item <?php echo $active_tab === 'users' ? 'active' : ''; ?>">
+                <a href="<?php echo route('admin/users'); ?>" class="menu-item <?php echo $active_tab === 'users' ? 'active' : ''; ?>">
                     <!-- Users Icon SVG -->
                     <svg class="menu-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
@@ -56,7 +66,7 @@ $active_tab = $active_tab ?? 'dashboard';
                     Direktori Pengguna
                 </a>
                 
-                <a href="/admin/history" class="menu-item <?php echo $active_tab === 'history' ? 'active' : ''; ?>">
+                <a href="<?php echo route('admin/history'); ?>" class="menu-item <?php echo $active_tab === 'history' ? 'active' : ''; ?>">
                     <!-- History Icon SVG -->
                     <svg class="menu-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <circle cx="12" cy="12" r="10"></circle>
@@ -65,7 +75,7 @@ $active_tab = $active_tab ?? 'dashboard';
                     Rekod Imbasan
                 </a>
 
-                <a href="/admin/cms" class="menu-item <?php echo $active_tab === 'cms' ? 'active' : ''; ?>">
+                <a href="<?php echo route('admin/cms'); ?>" class="menu-item <?php echo $active_tab === 'cms' ? 'active' : ''; ?>">
                     <!-- Settings/Edit Icon SVG -->
                     <svg class="menu-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
@@ -85,7 +95,7 @@ $active_tab = $active_tab ?? 'dashboard';
                         <span class="admin-role">Pentadbir RISDA</span>
                     </div>
                 </div>
-                <a href="/admin/logoutWeb" class="btn-logout" title="Log Keluar">
+                <a href="<?php echo route('admin/logoutWeb'); ?>" class="btn-logout" title="Log Keluar">
                     <!-- Log Out Icon SVG -->
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>

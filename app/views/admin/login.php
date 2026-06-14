@@ -40,8 +40,13 @@
                 </div>
             <?php endif; ?>
 
+            <?php 
+            $isIndexPhp = (strpos($_SERVER['REQUEST_URI'], 'index.php') !== false);
+            $loginAction = $isIndexPhp ? '/index.php?url=admin/loginWeb' : '/admin/loginWeb';
+            $homeUrl = $isIndexPhp ? '/index.php?url=' : '/';
+            ?>
             <!-- Borang Log Masuk -->
-            <form action="/admin/loginWeb" method="POST" class="login-form">
+            <form action="<?php echo $loginAction; ?>" method="POST" class="login-form">
                 <div class="form-group">
                     <label for="email">E-mel Pentadbir</label>
                     <input type="email" id="email" name="email" required placeholder="admin@demo.com" autocomplete="email" aria-required="true">
@@ -58,7 +63,7 @@
             </form>
 
             <footer class="login-footer">
-                <p><a href="/" class="back-link">&larr; Kembali ke Landing Page</a></p>
+                <p><a href="<?php echo $homeUrl; ?>" class="back-link">&larr; Kembali ke Landing Page</a></p>
             </footer>
             
         </div>

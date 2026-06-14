@@ -101,6 +101,21 @@ class App {
         if (isset($_GET['url'])) {
             return rtrim($_GET['url'], '/');
         }
-        return '';
+
+        // Fallback jika URL rewriting tidak memasukkan parameter ?url=
+        $requestUri = $_SERVER['REQUEST_URI'] ?? '';
+        $path = parse_url($requestUri, PHP_URL_PATH);
+        $path = trim($path, '/');
+
+        // Jika terdapat index.php di permulaan path (cth: /index.php/pentadbir -> pentadbir)
+        if (strpos($path, 'index.php') === 0) {
+            $path = trim(substr($path, 9), '/');
+        }
+        // Jika terdapat public/ di permulaan path
+        if (strpos($path, 'public/') === 0) {
+            $path = trim(substr($path, 7), '/');
+        }
+
+        return $path;
     }
 }

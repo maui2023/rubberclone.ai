@@ -28,4 +28,15 @@ class Controller {
         echo json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         exit;
     }
+
+    // Melakukan penghalaan (redirect) dengan sokongan fallback jika URL rewriting tiada
+    public function redirect($path) {
+        $cleanPath = ltrim($path, '/');
+        if (strpos($_SERVER['REQUEST_URI'], 'index.php') !== false) {
+            header("Location: /index.php?url=" . $cleanPath);
+        } else {
+            header("Location: /" . $cleanPath);
+        }
+        exit;
+    }
 }

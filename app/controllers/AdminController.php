@@ -68,8 +68,7 @@ class AdminController extends Controller {
                 $_SESSION['admin_fullname'] = $user['fullname'];
                 $_SESSION['admin_role'] = $user['role'];
 
-                header("Location: /pentadbir");
-                exit;
+                $this->redirect('pentadbir');
             } else {
                 $this->view('admin/login', [
                     'title' => 'Log Masuk Pentadbir - Rubber Clone AI',
@@ -79,8 +78,7 @@ class AdminController extends Controller {
             }
         }
         
-        header("Location: /pentadbir");
-        exit;
+        $this->redirect('pentadbir');
     }
 
     // Mengendalikan log keluar web pentadbir (GET)
@@ -90,8 +88,7 @@ class AdminController extends Controller {
         unset($_SESSION['admin_fullname']);
         unset($_SESSION['admin_role']);
         session_destroy();
-        header("Location: /pentadbir");
-        exit;
+        $this->redirect('pentadbir');
     }
 
     // --- PANDANGAN PORTAL (WEB VIEWS) ---

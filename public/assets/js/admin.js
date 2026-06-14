@@ -1,5 +1,18 @@
 // public/assets/js/admin.js
 
+const isCleanUrl = !window.location.pathname.includes('index.php');
+function getApiUrl(path) {
+    if (isCleanUrl) {
+        return '/' + path;
+    } else {
+        if (path.includes('?')) {
+            const parts = path.split('?');
+            return '/index.php?url=' + parts[0] + '&' + parts[1];
+        }
+        return '/index.php?url=' + path;
+    }
+}
+
 document.addEventListener("DOMContentLoaded", function () {
     // 1. Logik Papan Pemuka (Dashboard)
     if (document.getElementById("map")) {
@@ -35,7 +48,7 @@ function initDashboard() {
     }).addTo(map);
 
     // Dapatkan data statistik & geografi melalui API
-    fetch('/api/admin/stats')
+    fetch(getApiUrl('api/admin/stats'))
         .then(response => response.json())
         .then(res => {
             if (res.status === 'success') {
@@ -154,7 +167,7 @@ function initUsersDirectory() {
     const searchInput = document.getElementById('search-users-input');
 
     // Mengambil data senarai pengguna
-    fetch('/api/admin/users')
+    fetch(getApiUrl('api/admin/users'))
         .then(response => response.json())
         .then(res => {
             if (res.status === 'success') {
@@ -223,7 +236,7 @@ function toggleUserAccess(userId, checkbox) {
     const badge = document.getElementById(`badge-status-${userId}`);
 
     // Hantar permintaan ke API
-    fetch('/api/admin/toggle_user', {
+    fetch(getApiUrl('api/admin/toggle_user'), {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -267,7 +280,7 @@ function initHistoryAudit() {
     const closeModalBtn = document.getElementById('close-modal-btn');
 
     // Mengambil data senarai imbasan daun
-    fetch('/api/analysis/list')
+    fetch(getApiUrl('api/analysis/list'))
         .then(response => response.json())
         .then(res => {
             if (res.status === 'success') {
@@ -422,7 +435,7 @@ function deleteHistoryRecord(recordId) {
         return;
     }
 
-    fetch(`/api/analysis/delete?id=${recordId}`, {
+    fetch(getApiUrl(`api/analysis/delete?id=${recordId}`), {
         method: 'DELETE'
     })
     .then(response => response.json())
@@ -451,7 +464,7 @@ function initCmsManagement() {
             
             const formData = new FormData(cmsForm);
             
-            fetch('/api/admin/update_cms', {
+            fetch(getApiUrl('api/admin/update_cms'), {
                 method: 'POST',
                 body: formData
             })
@@ -476,7 +489,7 @@ function initCmsManagement() {
             
             const formData = new FormData(blogForm);
             
-            fetch('/api/admin/blog/create', {
+            fetch(getApiUrl('api/admin/blog/create'), {
                 method: 'POST',
                 body: formData
             })
@@ -551,7 +564,7 @@ function deleteBlogStory(blogId) {
         return;
     }
 
-    fetch(`/api/admin/blog/delete?id=${blogId}`, {
+    fetch(getApiUrl(`api/admin/blog/delete?id=${blogId}`), {
         method: 'DELETE'
     })
     .then(response => response.json())

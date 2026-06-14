@@ -8,8 +8,23 @@ class AnalysisController extends Controller {
         $this->analysisModel = $this->model('AnalysisRecord');
     }
 
-    // Melakukan pengesahan token JWT dan memulangkan payload jika sah
+    // Melakukan pengesahan token JWT atau Session Admin dan memulangkan payload jika sah
     private function checkAuth() {
+        // 1. Cuba semak Session dahulu (untuk request AJAX dari portal)
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        if (isset($_SESSION['admin_id']) && $_SESSION['admin_role'] === 'admin') {
+            return [
+                'id' => $_SESSION['admin_id'],
+                'username' => $_SESSION['admin_username'] ?? 'admin',
+                'fullname' => $_SESSION['admin_fullname'] ?? 'Pentadbir',
+                'role' => 'admin'
+            ];
+        }
+
+        // 2. Jika tiada Session, semak JWT Bearer Token (untuk Postman/Ujian luar)
         $token = JWT::getBearerToken();
         if (!$token) {
             $this->jsonResponse(["status" => "error", "message" => "Token pengesahan tidak disediakan."], 401);

@@ -95,7 +95,7 @@ server {
     index index.php index.html;
 
     location / {
-        try_files $uri $uri/ /index.php?url=$query_string;
+        try_files $uri $uri/ /index.php?url=$uri&$args;
     }
 
     location ~ \.php$ {

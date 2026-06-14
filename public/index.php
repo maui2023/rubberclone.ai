@@ -37,11 +37,11 @@ spl_autoload_register(function ($class) {
     }
 });
 
-// Fungsi pembantu routing global dengan sokongan fallback
 if (!function_exists('route')) {
     function route($path) {
         $cleanPath = ltrim($path, '/');
-        if (strpos($_SERVER['REQUEST_URI'], 'index.php') !== false) {
+        $useFallback = (defined('DISABLE_CLEAN_URLS') && DISABLE_CLEAN_URLS) || (strpos($_SERVER['REQUEST_URI'], 'index.php') !== false);
+        if ($useFallback) {
             return '/index.php?url=' . $cleanPath;
         }
         return '/' . $cleanPath;

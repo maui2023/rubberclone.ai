@@ -5,3 +5,4 @@ public/uploads/
 Thumbs.db
 .well-known/
 app/config/database.php
+api_documentation.md

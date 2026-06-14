@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Laporan Lapangan & Kisah Kejayaan - RISDA BESUT. Cerita dan rujukan agronomi tapak semaian getah.">
     <title>Laporan Lapangan & Kisah Kejayaan - RISDA BESUT</title>
-    <link rel="stylesheet" href="/styles.css?v=<?php echo filemtime(__DIR__ . '/../../styles.css'); ?>">
+    <link rel="stylesheet" href="/styles.css?v=<?php echo @filemtime(__DIR__ . '/../../public/styles.css'); ?>">
     <style>
         :root {
             --color-bg-forest-light: #162E24;

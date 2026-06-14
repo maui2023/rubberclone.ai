@@ -16,7 +16,7 @@
     <title>Sistem Pengecaman Klon Pokok Getah - RISDA BESUT</title>
     
     <!-- External Stylesheet -->
-    <link rel="stylesheet" href="/styles.css?v=<?php echo filemtime(__DIR__ . '/../../styles.css'); ?>">
+    <link rel="stylesheet" href="/styles.css?v=<?php echo @filemtime(__DIR__ . '/../../public/styles.css'); ?>">
 </head>
 <body>
 

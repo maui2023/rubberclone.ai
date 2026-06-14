@@ -12,7 +12,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
     
     <!-- CSS File -->
-    <link rel="stylesheet" href="/assets/css/admin.css?v=<?php echo @filemtime(__DIR__ . '/../../public/assets/css/admin.css'); ?>">
+    <link rel="stylesheet" href="/assets/css/admin.css?v=<?php echo @filemtime(__DIR__ . '/../../../public/assets/css/admin.css'); ?>">
 </head>
 <body class="login-body">
     

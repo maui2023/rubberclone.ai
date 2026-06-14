@@ -16,7 +16,7 @@ $active_tab = $active_tab ?? 'dashboard';
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
     
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="/assets/css/admin.css?v=<?php echo filemtime(__DIR__ . '/../../public/assets/css/admin.css'); ?>">
+    <link rel="stylesheet" href="/assets/css/admin.css?v=<?php echo @filemtime(__DIR__ . '/../../../public/assets/css/admin.css'); ?>">
 </head>
 <body>
 

@@ -12,6 +12,6 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <!-- Custom Admin Portal Script -->
-    <script src="/assets/js/admin.js?v=<?php echo filemtime(__DIR__ . '/../../public/assets/js/admin.js'); ?>"></script>
+    <script src="/assets/js/admin.js?v=<?php echo @filemtime(__DIR__ . '/../../../public/assets/js/admin.js'); ?>"></script>
 </body>
 </html>

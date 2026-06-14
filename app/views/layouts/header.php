@@ -7,7 +7,7 @@ $active_tab = $active_tab ?? 'dashboard';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo $title ?? 'Portal Pentadbir - Rubber Clone AI'; ?></title>
+    <title><?php echo $title ?? 'Portal Pentadbir - RISDA BESUT'; ?></title>
     
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -25,12 +25,9 @@ $active_tab = $active_tab ?? 'dashboard';
         
         <!-- Sidebar Navigation -->
         <aside class="sidebar">
-            <div class="sidebar-header">
-                <!-- Leaf SVG Icon -->
-                <svg class="sidebar-logo-icon" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 3.5 1 9.8a7 7 0 0 1-9 8.2z"></path>
-                </svg>
-                <span class="sidebar-logo-text">RubberClone<span style="color: var(--color-gold-latex);">AI</span></span>
+            <div class="sidebar-header" style="display: flex; align-items: center; gap: 10px; padding: 1.5rem 1rem;">
+                <img src="/public/assets/images/risda_logo.jpg" alt="RISDA Logo" style="width: 30px; height: 30px; border-radius: 50%; border: 1.2px solid var(--color-gold-latex);">
+                <span class="sidebar-logo-text" style="font-family: 'Outfit', sans-serif; font-size: 1.1rem;">RISDA <span style="color: var(--color-gold-latex);">BESUT</span></span>
             </div>
             
             <nav class="sidebar-menu" aria-label="Menu Pentadbir">

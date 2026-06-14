@@ -14,8 +14,18 @@ class AdminController extends Controller {
         $this->analysisModel = $this->model('AnalysisRecord');
     }
 
-    // Memastikan pengguna adalah admin sebelum memaparkan halaman web
+    // Pembantu untuk mengesan jika pelawat menggunakan peranti mudah alih (mobile)
+    private function isMobileDevice() {
+        $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? '';
+        return (bool)preg_match("/(android|avantgo|blackberry|bolt|boost|cricket|docomo|fone|hiptop|mini|mobi|palm|phone|pie|tablet|up\.browser|up\.link|webos|wos)/i", $userAgent);
+    }
+
+    // Memastikan pengguna adalah admin sebelum memaparkan halaman web (Menghalang Mobile)
     private function checkWebAuth() {
+        if ($this->isMobileDevice()) {
+            $this->view('admin/mobile_block', ['title' => 'Akses Dihalang - Rubber Clone AI']);
+            exit;
+        }
         if (!isset($_SESSION['admin_id']) || $_SESSION['admin_role'] !== 'admin') {
             // Jika ia request biasa, paparkan borang log masuk
             $this->view('admin/login', ['title' => 'Log Masuk Pentadbir - Rubber Clone AI']);
@@ -49,6 +59,10 @@ class AdminController extends Controller {
 
     // Mengendalikan log masuk web pentadbir (POST dari borang login portal)
     public function loginWeb() {
+        if ($this->isMobileDevice()) {
+            $this->view('admin/mobile_block', ['title' => 'Akses Dihalang - Rubber Clone AI']);
+            exit;
+        }
         if (isset($_POST['email']) && isset($_POST['password'])) {
             $email = trim($_POST['email']);
             $password = trim($_POST['password']);

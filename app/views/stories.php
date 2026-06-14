@@ -174,6 +174,11 @@
             <nav class="nav-links" id="navigation-menu">
                 <a href="<?php echo route(''); ?>" class="nav-link">Laman Utama</a>
             </nav>
+            <button class="burger-menu" id="burger-menu-btn" aria-label="Buka Menu Navigasi" aria-expanded="false">
+                <span class="burger-bar"></span>
+                <span class="burger-bar"></span>
+                <span class="burger-bar"></span>
+            </button>
         </div>
     </header>
 
@@ -257,6 +262,28 @@
                 btnText.textContent = 'Tutup Cerita';
             }
         }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            const burgerBtn = document.getElementById("burger-menu-btn");
+            const navMenu = document.getElementById("navigation-menu");
+
+            if (burgerBtn && navMenu) {
+                burgerBtn.addEventListener("click", function() {
+                    const isActive = navMenu.classList.toggle("active");
+                    burgerBtn.classList.toggle("active");
+                    burgerBtn.setAttribute("aria-expanded", isActive);
+                });
+
+                const navLinks = navMenu.querySelectorAll(".nav-link");
+                navLinks.forEach(link => {
+                    link.addEventListener("click", function() {
+                        navMenu.classList.remove("active");
+                        burgerBtn.classList.remove("active");
+                        burgerBtn.setAttribute("aria-expanded", "false");
+                    });
+                });
+            }
+        });
     </script>
 </body>
 </html>

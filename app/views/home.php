@@ -34,6 +34,11 @@
                 <a href="#stats" class="nav-link" id="link-stats">Statistik</a>
                 <!-- NOTA: Butang Login Admin dikeluarkan dari menu atas arahan keselamatan pentadbiran -->
             </nav>
+            <button class="burger-menu" id="burger-menu-btn" aria-label="Buka Menu Navigasi" aria-expanded="false">
+                <span class="burger-bar"></span>
+                <span class="burger-bar"></span>
+                <span class="burger-bar"></span>
+            </button>
         </div>
     </header>
 
@@ -212,5 +217,29 @@
         </div>
     </footer>
 
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const burgerBtn = document.getElementById("burger-menu-btn");
+            const navMenu = document.getElementById("navigation-menu");
+
+            if (burgerBtn && navMenu) {
+                burgerBtn.addEventListener("click", function() {
+                    const isActive = navMenu.classList.toggle("active");
+                    burgerBtn.classList.toggle("active");
+                    burgerBtn.setAttribute("aria-expanded", isActive);
+                });
+
+                // Tutup menu apabila pautan diklik (terutama pautan anchor halaman sama)
+                const navLinks = navMenu.querySelectorAll(".nav-link");
+                navLinks.forEach(link => {
+                    link.addEventListener("click", function() {
+                        navMenu.classList.remove("active");
+                        burgerBtn.classList.remove("active");
+                        burgerBtn.setAttribute("aria-expanded", "false");
+                    });
+                });
+            }
+        });
+    </script>
 </body>
 </html>

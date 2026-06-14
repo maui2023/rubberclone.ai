@@ -9,14 +9,14 @@
     <!-- Open Graph Meta Tags for Social Previews -->
     <meta property="og:title" content="RISDA BESUT - Sistem Pengecaman Klon Pokok Getah">
     <meta property="og:description" content="Pengecaman klon getah RISDA dengan ketepatan tinggi menggunakan kuasa kecerdasan buatan (Gemini AI). Muat turun aplikasi Android sekarang.">
-    <meta property="og:image" content="/public/assets/images/risda_logo.jpg">
+    <meta property="og:image" content="/assets/images/risda_logo.jpg">
     <meta property="og:url" content="https://rubberclone-ai.pats.my">
     <meta property="og:type" content="website">
 
     <title>Sistem Pengecaman Klon Pokok Getah - RISDA BESUT</title>
     
     <!-- External Stylesheet -->
-    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="/styles.css?v=<?php echo filemtime(__DIR__ . '/../../styles.css'); ?>">
 </head>
 <body>
 
@@ -24,7 +24,7 @@
     <header class="header-nav" id="main-header">
         <div class="nav-container">
             <a href="#" class="logo" id="brand-logo" aria-label="Laman Utama Rubber Clone AI" style="display: flex; align-items: center; gap: 10px;">
-                <img src="/public/assets/images/risda_logo.jpg" alt="RISDA Logo" style="width: 38px; height: 38px; border-radius: 50%; border: 1.5px solid var(--color-gold-latex);">
+                <img src="/assets/images/risda_logo.jpg" alt="RISDA Logo" style="width: 38px; height: 38px; border-radius: 50%; border: 1.5px solid var(--color-gold-latex);">
                 <span class="logo-brand">RISDA <span style="color: var(--color-gold-latex);">BESUT</span></span>
             </a>
             <nav class="nav-links" id="navigation-menu" aria-label="Menu Navigasi Utama">

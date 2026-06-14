@@ -16,7 +16,7 @@ $active_tab = $active_tab ?? 'dashboard';
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
     
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="/assets/css/admin.css">
+    <link rel="stylesheet" href="/assets/css/admin.css?v=<?php echo filemtime(__DIR__ . '/../../public/assets/css/admin.css'); ?>">
 </head>
 <body>
 
@@ -26,7 +26,7 @@ $active_tab = $active_tab ?? 'dashboard';
         <!-- Sidebar Navigation -->
         <aside class="sidebar">
             <div class="sidebar-header" style="display: flex; align-items: center; gap: 10px; padding: 1.5rem 1rem;">
-                <img src="/public/assets/images/risda_logo.jpg" alt="RISDA Logo" style="width: 30px; height: 30px; border-radius: 50%; border: 1.2px solid var(--color-gold-latex);">
+                <img src="/assets/images/risda_logo.jpg" alt="RISDA Logo" style="width: 30px; height: 30px; border-radius: 50%; border: 1.2px solid var(--color-gold-latex);">
                 <span class="sidebar-logo-text" style="font-family: 'Outfit', sans-serif; font-size: 1.1rem;">RISDA <span style="color: var(--color-gold-latex);">BESUT</span></span>
             </div>
             

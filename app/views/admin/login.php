@@ -12,7 +12,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
     
     <!-- CSS File -->
-    <link rel="stylesheet" href="/assets/css/admin.css">
+    <link rel="stylesheet" href="/assets/css/admin.css?v=<?php echo filemtime(__DIR__ . '/../../public/assets/css/admin.css'); ?>">
 </head>
 <body class="login-body">
     
@@ -21,7 +21,7 @@
             
             <!-- Logo Header -->
             <header class="login-header" style="text-align: center; margin-bottom: 2rem;">
-                <img src="/public/assets/images/risda_logo.jpg" alt="RISDA Logo" style="width: 80px; height: 80px; border-radius: 50%; border: 2px solid var(--color-gold-latex); margin-bottom: 1rem;">
+                <img src="/assets/images/risda_logo.jpg" alt="RISDA Logo" style="width: 80px; height: 80px; border-radius: 50%; border: 2px solid var(--color-gold-latex); margin-bottom: 1rem;">
                 <h1 class="login-brand-title" style="font-size: 1.6rem; margin: 0; font-family: 'Outfit', sans-serif;">Sistem Pengecaman Klon Pokok Getah</h1>
                 <p class="login-subtitle" style="color: var(--color-gold-latex); font-weight: bold; margin-top: 0.2rem; font-size: 1.1rem; letter-spacing: 1px;">RISDA BESUT</p>
             </header>

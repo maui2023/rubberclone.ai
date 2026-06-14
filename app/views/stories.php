@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Laporan Lapangan & Kisah Kejayaan - RISDA BESUT. Cerita dan rujukan agronomi tapak semaian getah.">
     <title>Laporan Lapangan & Kisah Kejayaan - RISDA BESUT</title>
-    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="/styles.css?v=<?php echo filemtime(__DIR__ . '/../../styles.css'); ?>">
     <style>
         :root {
             --color-bg-forest-light: #162E24;
@@ -168,7 +168,7 @@
     <header class="header-nav" id="main-header">
         <div class="nav-container">
             <a href="<?php echo route(''); ?>" class="logo" id="brand-logo" aria-label="Laman Utama Rubber Clone AI" style="display: flex; align-items: center; gap: 10px;">
-                <img src="/public/assets/images/risda_logo.jpg" alt="RISDA Logo" style="width: 38px; height: 38px; border-radius: 50%; border: 1.5px solid var(--color-gold-latex);">
+                <img src="/assets/images/risda_logo.jpg" alt="RISDA Logo" style="width: 38px; height: 38px; border-radius: 50%; border: 1.5px solid var(--color-gold-latex);">
                 <span class="logo-brand">RISDA <span style="color: var(--color-gold-latex);">BESUT</span></span>
             </a>
             <nav class="nav-links" id="navigation-menu">

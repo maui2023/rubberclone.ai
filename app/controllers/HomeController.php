@@ -21,6 +21,17 @@ class HomeController extends Controller {
         ]);
     }
 
+    // Mengendalikan paparan Halaman Kisah Kejayaan Penuh (GET /stories)
+    public function storiesView() {
+        $settings = $this->cmsModel->getAll();
+        $blogs = $this->blogModel->getAll();
+
+        $this->view('stories', [
+            'settings' => $settings,
+            'blogs' => $blogs
+        ]);
+    }
+
     // API Awam mengambil senarai kisah kejayaan (GET /api/blog/list)
     public function getBlogPosts() {
         $blogs = $this->blogModel->getAll();

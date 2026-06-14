@@ -1,16 +1,6 @@
 <?php
 // app/views/layouts/header.php
 $active_tab = $active_tab ?? 'dashboard';
-
-if (!function_exists('route')) {
-    function route($path) {
-        $cleanPath = ltrim($path, '/');
-        if (strpos($_SERVER['REQUEST_URI'], 'index.php') !== false) {
-            return '/index.php?url=' . $cleanPath;
-        }
-        return '/' . $cleanPath;
-    }
-}
 ?>
 <!DOCTYPE html>
 <html lang="ms">

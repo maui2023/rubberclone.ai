@@ -14,6 +14,7 @@ class App {
         $routes = [
             // 0. Laluan Awam (Public Views & Blog API)
             ''                      => ['HomeController', 'index', 'GET'],
+            'stories'               => ['HomeController', 'storiesView', 'GET'],
             'api/blog/list'         => ['HomeController', 'getBlogPosts', 'GET'],
 
             // 1. Laluan API Pengesahan (Auth Endpoints)

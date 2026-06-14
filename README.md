@@ -181,6 +181,7 @@ Sistem ini dibina berasaskan corak reka bentuk MVC ringkas di mana semua laluan 
 | Laluan (Route) | Controller / Kaedah | Perihalan |
 | :--- | :--- | :--- |
 | `/` | `HomeController@index` | Paparan Landing Page Dinamik awam |
+| `/stories` | `HomeController@storiesView` | Paparan Halaman Cerita Blog / Kisah Kejayaan (menyokong expand/collapse inline) |
 | `/pentadbir` | `AdminController@dashboard` | Papan Pemuka Pentadbir / Borang Log Masuk (pintu masuk pentadbir rahsia, disembunyikan dari menu awam) |
 | `/admin/users` | `AdminController@usersView` | Halaman Pengurusan Direktori Pengguna |
 | `/admin/history` | `AdminController@historyView` | Halaman Sejarah Audit & Imbasan Geografi |

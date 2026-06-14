@@ -35,7 +35,7 @@
             <nav class="nav-links" id="navigation-menu" aria-label="Menu Navigasi Utama">
                 <a href="#features" class="nav-link" id="link-features">Ciri-Ciri</a>
                 <a href="#how-it-works" class="nav-link" id="link-how-it-works">Cara Penggunaan</a>
-                <a href="#stories" class="nav-link" id="link-stories">Kisah & Kejayaan</a>
+                <a href="<?php echo route('stories'); ?>" class="nav-link" id="link-stories">Kisah & Kejayaan</a>
                 <a href="#stats" class="nav-link" id="link-stats">Statistik</a>
                 <!-- NOTA: Butang Login Admin dikeluarkan dari menu atas arahan keselamatan pentadbiran -->
             </nav>
@@ -180,40 +180,15 @@
             </div>
         </section>
 
-        <!-- Kisah Kejayaan (Blog Stories Section) -->
-        <section class="features-section" id="stories" style="background: linear-gradient(180deg, transparent, rgba(22, 46, 36, 0.1), transparent);">
-            <div class="section-header">
+        <!-- Kisah Kejayaan Promo Banner Section -->
+        <section class="features-section" id="stories-promo" style="background: linear-gradient(180deg, transparent, rgba(22, 46, 36, 0.1), transparent); padding: 5rem 2rem; text-align: center;">
+            <div class="section-header" style="max-width: 650px; margin: 0 auto;">
                 <span class="section-subtitle">Laporan Lapangan</span>
                 <h2>Kisah Kejayaan & Cerita Blog</h2>
-                <p class="section-desc">Perkongsian pengalaman dari stesen tapak semaian dan rujukan penyelidikan klon getah RISDA.</p>
-            </div>
-            
-            <div class="blog-grid" id="blog-stories-layout">
-                <?php if (empty($blogs)): ?>
-                    <p style="text-align: center; grid-column: 1/-1; color: var(--color-text-muted); font-style: italic;">Tiada sebarang artikel kisah kejayaan buat masa ini.</p>
-                <?php else: ?>
-                    <?php foreach ($blogs as $post): ?>
-                        <article class="feature-card blog-card" id="blog-card-<?php echo $post['id']; ?>" style="gap: 1rem; padding: 2rem;">
-                            <?php if ($post['image_url']): ?>
-                                <div class="blog-image-wrapper" style="width: 100%; height: 180px; overflow: hidden; border-radius: var(--radius-md); border: 1px solid rgba(255, 255, 255, 0.05); margin-bottom: 0.5rem;">
-                                    <img src="/<?php echo htmlspecialchars($post['image_url']); ?>" alt="<?php echo htmlspecialchars($post['title']); ?>" style="width: 100%; height: 100%; object-fit: cover;">
-                                </div>
-                            <?php endif; ?>
-                            <span class="hero-badge" style="font-size: 0.7rem; width: fit-content; margin-bottom: 0; padding: 0.15rem 0.6rem; border-color: rgba(16, 185, 129, 0.2); background: rgba(16, 185, 129, 0.05); color: var(--color-emerald);">
-                                <?php echo htmlspecialchars($post['author']); ?>
-                            </span>
-                            <h3 class="feature-title" style="font-size: 1.2rem; line-height: 1.3; margin-top: 0.25rem;">
-                                <?php echo htmlspecialchars($post['title']); ?>
-                            </h3>
-                            <p class="feature-desc" style="font-size: 0.85rem; line-height: 1.5; color: var(--color-text-secondary);">
-                                <?php echo htmlspecialchars($post['content']); ?>
-                            </p>
-                            <span style="font-size: 0.75rem; color: var(--color-text-muted);">
-                                <?php echo date('d M Y', strtotime($post['created_at'])); ?>
-                            </span>
-                        </article>
-                    <?php endforeach; ?>
-                <?php endif; ?>
+                <p class="section-desc" style="margin-bottom: 2rem;">Ikuti maklum balas tapak semaian, kisah kejayaan pekebun kecil RISDA, serta rujukan kajian agronomi klon getah terbaharu di seluruh Malaysia.</p>
+                <a href="<?php echo route('stories'); ?>" class="btn btn-primary" id="btn-view-all-stories" style="border: none; padding: 0.8rem 2rem;">
+                    Lihat Kisah & Laporan Lapangan &rarr;
+                </a>
             </div>
         </section>
 

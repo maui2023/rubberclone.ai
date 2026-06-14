@@ -3,3 +3,4 @@ public/uploads/
 .env
 .DS_Store
 Thumbs.db
+.well-known/

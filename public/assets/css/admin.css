@@ -1,0 +1,839 @@
+/* public/assets/css/admin.css */
+/* Import Outfit and Inter fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;500;600;700;800&display=swap');
+
+:root {
+    --color-bg-dark: #070e0b;
+    --color-bg-forest: #0d1b15;
+    --color-bg-forest-light: #162e24;
+    --color-emerald: #10b981;
+    --color-emerald-hover: #059669;
+    --color-emerald-glow: rgba(16, 185, 129, 0.3);
+    --color-mint-light: #ecfdf5;
+    --color-gold-latex: #f59e0b;
+    --color-gold-glow: rgba(245, 158, 11, 0.4);
+    
+    --color-text-primary: var(--color-mint-light);
+    --color-text-secondary: rgba(236, 253, 245, 0.75);
+    --color-text-muted: rgba(236, 253, 245, 0.45);
+    
+    --glass-bg: rgba(22, 46, 36, 0.45);
+    --glass-border: rgba(255, 255, 255, 0.05);
+    --glass-border-hover: rgba(16, 185, 129, 0.25);
+    --glass-shadow: rgba(0, 0, 0, 0.4);
+    
+    --font-heading: 'Outfit', 'Inter', system-ui, sans-serif;
+    --font-body: 'Inter', system-ui, sans-serif;
+    
+    --radius-lg: 20px;
+    --radius-md: 12px;
+    --radius-sm: 6px;
+    --transition-smooth: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Reset Asas */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-body);
+    background-color: var(--color-bg-dark);
+    background-image: radial-gradient(circle at 50% -20%, var(--color-bg-forest-light) 0%, var(--color-bg-dark) 70%);
+    color: var(--color-text-primary);
+    min-block-size: 100vh;
+    overflow-x: hidden;
+    line-height: 1.5;
+}
+
+/* --- BORANG LOG MASUK WEB ADMIN --- */
+.login-body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+}
+
+.login-container {
+    width: 100%;
+    max-width: 450px;
+    padding: 1.5rem;
+}
+
+.login-card {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-radius: var(--radius-lg);
+    padding: 3rem 2.5rem;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    text-align: center;
+}
+
+.login-logo-icon {
+    color: var(--color-emerald);
+    margin-bottom: 1rem;
+    filter: drop-shadow(0 0 8px var(--color-emerald-glow));
+}
+
+.login-brand-title {
+    font-family: var(--font-heading);
+    font-size: 2rem;
+    font-weight: 800;
+    margin-bottom: 0.25rem;
+}
+
+.login-subtitle {
+    font-size: 0.9rem;
+    color: var(--color-text-secondary);
+    margin-bottom: 2rem;
+}
+
+.login-error {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.25);
+    color: #ef4444;
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius-md);
+    font-size: 0.85rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-align: left;
+}
+
+.login-form {
+    text-align: left;
+}
+
+.form-group {
+    margin-bottom: 1.25rem;
+}
+
+.form-group label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+    margin-bottom: 0.5rem;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    background: rgba(7, 14, 11, 0.6);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-md);
+    color: var(--color-text-primary);
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    transition: var(--transition-smooth);
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: var(--color-emerald);
+    box-shadow: 0 0 10px var(--color-emerald-glow);
+}
+
+.btn-block {
+    width: 100%;
+    margin-top: 1.5rem;
+}
+
+.login-footer {
+    margin-top: 2rem;
+}
+
+.back-link {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    transition: var(--transition-smooth);
+}
+
+.back-link:hover {
+    color: var(--color-emerald);
+}
+
+/* --- TATA RAJAH PENTADBIR (ADMIN LAYOUT) --- */
+.admin-wrapper {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* Sidebar Navigation */
+.sidebar {
+    width: 260px;
+    background: rgba(7, 14, 11, 0.8);
+    border-right: 1px solid var(--glass-border);
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    height: 100vh;
+    z-index: 10;
+}
+
+.sidebar-header {
+    padding: 2rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.sidebar-logo-icon {
+    color: var(--color-emerald);
+    filter: drop-shadow(0 0 5px var(--color-emerald-glow));
+}
+
+.sidebar-logo-text {
+    font-family: var(--font-heading);
+    font-size: 1.25rem;
+    font-weight: 800;
+}
+
+.sidebar-menu {
+    padding: 1.5rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    flex-grow: 1;
+}
+
+.menu-item {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    padding: 0.85rem 1rem;
+    border-radius: var(--radius-md);
+    color: var(--color-text-secondary);
+    font-weight: 500;
+    font-size: 0.95rem;
+    transition: var(--transition-smooth);
+}
+
+.menu-item:hover {
+    background: rgba(16, 185, 129, 0.08);
+    color: var(--color-emerald);
+}
+
+.menu-item.active {
+    background: var(--color-emerald);
+    color: var(--color-bg-dark);
+    font-weight: 600;
+    box-shadow: 0 4px 15px var(--color-emerald-glow);
+}
+
+.sidebar-footer {
+    padding: 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.03);
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.admin-profile {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.admin-avatar {
+    width: 38px;
+    aspect-ratio: 1;
+    background: var(--color-emerald);
+    color: var(--color-bg-dark);
+    font-weight: 700;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-heading);
+}
+
+.admin-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.admin-name {
+    font-size: 0.85rem;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 140px;
+}
+
+.admin-role {
+    font-size: 0.7rem;
+    color: var(--color-text-muted);
+}
+
+.btn-logout {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.6rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--color-text-muted);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: var(--transition-smooth);
+}
+
+.btn-logout:hover {
+    border-color: rgba(239, 68, 68, 0.3);
+    color: #ef4444;
+    background: rgba(239, 68, 68, 0.05);
+}
+
+/* Main Content Area */
+.main-content {
+    margin-left: 260px;
+    flex-grow: 1;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Topbar */
+.topbar {
+    padding: 1.5rem 2.5rem;
+    border-bottom: 1px solid var(--glass-border);
+    background: rgba(7, 14, 11, 0.3);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    backdrop-filter: blur(8px);
+}
+
+.topbar-title h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.live-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--color-emerald);
+    background: rgba(16, 185, 129, 0.1);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    padding: 0.3rem 0.8rem;
+    border-radius: 50px;
+}
+
+.badge-dot {
+    width: 6px;
+    aspect-ratio: 1;
+    background: var(--color-emerald);
+    border-radius: 50%;
+    animation: pulse-emerald 2s infinite;
+}
+
+.page-content-wrapper {
+    padding: 2rem 2.5rem;
+    flex-grow: 1;
+}
+
+/* --- KAD METRIK --- */
+.metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.metric-card {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-md);
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    transition: var(--transition-smooth);
+}
+
+.metric-card:hover {
+    border-color: var(--glass-border-hover);
+    transform: translateY(-2px);
+}
+
+.metric-icon-wrapper {
+    width: 50px;
+    aspect-ratio: 1;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.metric-icon-wrapper.scans {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--color-emerald);
+}
+
+.metric-icon-wrapper.today {
+    background: rgba(245, 158, 11, 0.1);
+    color: var(--color-gold-latex);
+}
+
+.metric-icon-wrapper.users-active {
+    background: rgba(59, 130, 246, 0.1);
+    color: #3b82f6;
+}
+
+.metric-icon-wrapper.users-total {
+    background: rgba(139, 92, 246, 0.1);
+    color: #8b5cf6;
+}
+
+.metric-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.metric-label {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+}
+
+.metric-val {
+    font-family: var(--font-heading);
+    font-size: 1.75rem;
+    font-weight: 800;
+    line-height: 1.2;
+}
+
+/* --- DASHBOARD GRID (MAP + CHARTS) --- */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: 1.5rem;
+    align-items: start;
+}
+
+@media (max-width: 1100px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.dashboard-panel {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-lg);
+    padding: 2rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.panel-header {
+    margin-bottom: 1.5rem;
+}
+
+.panel-title {
+    font-family: var(--font-heading);
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.panel-subtitle {
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+}
+
+.dashboard-map {
+    width: 100%;
+    height: 480px;
+    border-radius: var(--radius-md);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    background-color: var(--color-bg-dark);
+}
+
+.chart-canvas-wrapper {
+    position: relative;
+    width: 100%;
+    max-height: 220px;
+}
+
+/* --- DATA TABLES --- */
+.table-panel {
+    margin-bottom: 2rem;
+}
+
+.table-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.search-bar-wrapper {
+    position: relative;
+    width: 280px;
+}
+
+.search-bar-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--color-text-muted);
+    pointer-events: none;
+}
+
+.search-bar-input, #search-users-input, #search-history-input {
+    width: 100%;
+    padding: 0.6rem 1rem 0.6rem 2.25rem;
+    background: rgba(7, 14, 11, 0.5);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-sm);
+    color: var(--color-text-primary);
+    font-size: 0.85rem;
+    transition: var(--transition-smooth);
+}
+
+.search-bar-input:focus, #search-users-input:focus, #search-history-input:focus {
+    outline: none;
+    border-color: var(--color-emerald);
+}
+
+.filter-select {
+    padding: 0.6rem 2rem 0.6rem 1rem;
+    background: rgba(7, 14, 11, 0.5);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-sm);
+    color: var(--color-text-primary);
+    font-size: 0.85rem;
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23ecfdf5' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    background-size: 14px;
+}
+
+.table-responsive-container {
+    width: 100%;
+    overflow-x: auto;
+    margin-top: 1rem;
+    border-radius: var(--radius-md);
+    border: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    font-size: 0.9rem;
+}
+
+.admin-table th {
+    background: rgba(22, 46, 36, 0.6);
+    color: var(--color-emerald);
+    font-weight: 600;
+    padding: 1rem;
+    border-bottom: 1px solid var(--glass-border);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.admin-table td {
+    padding: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+    color: var(--color-text-secondary);
+    vertical-align: middle;
+}
+
+.admin-table tr:hover td {
+    background: rgba(22, 46, 36, 0.2);
+    color: var(--color-text-primary);
+}
+
+.table-loading-row {
+    text-align: center;
+    padding: 3rem !important;
+    font-style: italic;
+    color: var(--color-text-muted);
+}
+
+/* Spinner */
+.spinner {
+    display: inline-block;
+    width: 18px;
+    aspect-ratio: 1;
+    border: 2px solid rgba(16, 185, 129, 0.2);
+    border-top-color: var(--color-emerald);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    vertical-align: middle;
+    margin-right: 0.5rem;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Custom Status Badges */
+.status-badge {
+    padding: 0.25rem 0.65rem;
+    border-radius: 50px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    display: inline-block;
+}
+
+.status-badge.active {
+    background: rgba(16, 185, 129, 0.15);
+    color: var(--color-emerald);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.status-badge.inactive {
+    background: rgba(239, 68, 68, 0.15);
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+/* Switch Togol Pintar */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 22px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    inset: 0;
+    background-color: rgba(255, 255, 255, 0.1);
+    transition: .4s;
+    border-radius: 34px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    aspect-ratio: 1;
+    left: 2px;
+    bottom: 2px;
+    background-color: var(--color-mint-light);
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: var(--color-emerald);
+}
+
+input:checked + .slider:before {
+    transform: translateX(22px);
+    background-color: var(--color-bg-dark);
+}
+
+/* Thumbnail Daun */
+.table-leaf-thumbnail {
+    width: 45px;
+    aspect-ratio: 1;
+    object-fit: cover;
+    border-radius: var(--radius-sm);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    cursor: pointer;
+    transition: var(--transition-smooth);
+}
+
+.table-leaf-thumbnail:hover {
+    transform: scale(1.1);
+    border-color: var(--color-emerald);
+}
+
+.no-image-placeholder {
+    width: 45px;
+    aspect-ratio: 1;
+    border-radius: var(--radius-sm);
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px dashed rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.65rem;
+    color: var(--color-text-muted);
+}
+
+/* Butang Tindakan */
+.btn-action-delete {
+    padding: 0.4rem;
+    border-radius: var(--radius-sm);
+    color: var(--color-text-muted);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition-smooth);
+    border: 1px solid transparent;
+}
+
+.btn-action-delete:hover {
+    color: #ef4444;
+    background: rgba(239, 68, 68, 0.08);
+    border-color: rgba(239, 68, 68, 0.15);
+}
+
+/* --- MODAL DIALOG --- */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 1.5rem;
+}
+
+.modal-card {
+    background: var(--color-bg-forest);
+    background-image: radial-gradient(circle at 50% 0%, var(--color-bg-forest-light) 0%, var(--color-bg-dark) 100%);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-lg);
+    width: 100%;
+    max-width: 800px;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6);
+    position: relative;
+    overflow: hidden;
+}
+
+.modal-close-btn {
+    position: absolute;
+    top: 1rem;
+    right: 1.5rem;
+    font-size: 2rem;
+    color: var(--color-text-secondary);
+    transition: var(--transition-smooth);
+    z-index: 5;
+}
+
+.modal-close-btn:hover {
+    color: var(--color-emerald);
+}
+
+.modal-body-content {
+    padding: 3rem 2.5rem;
+}
+
+.modal-header-title {
+    font-family: var(--font-heading);
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    padding-bottom: 0.75rem;
+}
+
+.modal-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 2rem;
+}
+
+@media (max-width: 680px) {
+    .modal-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.modal-visual img {
+    width: 100%;
+    max-height: 320px;
+    object-fit: cover;
+    border-radius: var(--radius-md);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.modal-text-details {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.modal-field {
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-field-label {
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.modal-field-val {
+    font-size: 0.95rem;
+    color: var(--color-text-primary);
+}
+
+/* Button Asas */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.6rem 1.5rem;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    transition: var(--transition-smooth);
+}
+
+.btn-primary {
+    background: var(--color-emerald);
+    color: var(--color-bg-dark);
+}
+
+.btn-primary:hover {
+    background: var(--color-emerald-hover);
+    transform: translateY(-1px);
+}
+
+/* Leaflet Customization for Dark Mode */
+.leaflet-container {
+    background: var(--color-bg-dark) !important;
+}
+
+/* --- ANIMATIONS & UTILITIES --- */
+@keyframes pulse-emerald {
+    0% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.5);
+    }
+    70% {
+        transform: scale(1);
+        box-shadow: 0 0 0 8px rgba(16, 185, 129, 0);
+    }
+    100% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+    }
+}

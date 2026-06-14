@@ -1,0 +1,68 @@
+<?php
+// app/views/admin/login.php
+?>
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><?php echo $title ?? 'Log Masuk Pentadbir - Rubber Clone AI'; ?></title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- CSS File -->
+    <link rel="stylesheet" href="/assets/css/admin.css">
+</head>
+<body class="login-body">
+    
+    <div class="login-container">
+        <div class="login-card">
+            
+            <!-- Logo Header -->
+            <header class="login-header">
+                <svg class="login-logo-icon" width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 3.5 1 9.8a7 7 0 0 1-9 8.2z"></path>
+                </svg>
+                <h1 class="login-brand-title">RubberClone<span style="color: var(--color-gold-latex);">AI</span></h1>
+                <p class="login-subtitle">Sistem Pemantauan & Papan Pemuka RISDA</p>
+            </header>
+
+            <!-- Paparan Ralat -->
+            <?php if (isset($error)): ?>
+                <div class="login-error" role="alert">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="8" x2="12" y2="12"></line>
+                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                    </svg>
+                    <span><?php echo htmlspecialchars($error); ?></span>
+                </div>
+            <?php endif; ?>
+
+            <!-- Borang Log Masuk -->
+            <form action="/admin/loginWeb" method="POST" class="login-form">
+                <div class="form-group">
+                    <label for="email">E-mel Pentadbir</label>
+                    <input type="email" id="email" name="email" required placeholder="admin@demo.com" autocomplete="email" aria-required="true">
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Kata Laluan</label>
+                    <input type="password" id="password" name="password" required placeholder="••••••••" autocomplete="current-password" aria-required="true">
+                </div>
+                
+                <button type="submit" class="btn btn-primary btn-block" id="btn-submit-login">
+                    Log Masuk Pentadbir
+                </button>
+            </form>
+
+            <footer class="login-footer">
+                <p><a href="/" class="back-link">&larr; Kembali ke Landing Page</a></p>
+            </footer>
+            
+        </div>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,10 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    
+    # Jika fail atau folder wujud secara fizikal, buka secara biasa
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    
+    # Jika tidak, halakan semua laluan ke index.php dengan parameter url
+    RewriteRule ^(.*)$ index.php?url=$1 [QSA,L]
+</IfModule>

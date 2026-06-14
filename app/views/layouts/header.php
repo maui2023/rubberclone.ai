@@ -1,0 +1,108 @@
+<?php
+// app/views/layouts/header.php
+$active_tab = $active_tab ?? 'dashboard';
+?>
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><?php echo $title ?? 'Portal Pentadbir - Rubber Clone AI'; ?></title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- LeafletJS Map CSS (Open-source interactive map) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/assets/css/admin.css">
+</head>
+<body>
+
+    <!-- Container Layout Utama -->
+    <div class="admin-wrapper">
+        
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <!-- Leaf SVG Icon -->
+                <svg class="sidebar-logo-icon" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 3.5 1 9.8a7 7 0 0 1-9 8.2z"></path>
+                </svg>
+                <span class="sidebar-logo-text">RubberClone<span style="color: var(--color-gold-latex);">AI</span></span>
+            </div>
+            
+            <nav class="sidebar-menu" aria-label="Menu Pentadbir">
+                <a href="/admin/dashboard" class="menu-item <?php echo $active_tab === 'dashboard' ? 'active' : ''; ?>">
+                    <!-- Grid Icon SVG -->
+                    <svg class="menu-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="14" width="7" height="7"></rect>
+                        <rect x="3" y="14" width="7" height="7"></rect>
+                    </svg>
+                    Papan Pemuka
+                </a>
+                
+                <a href="/admin/users" class="menu-item <?php echo $active_tab === 'users' ? 'active' : ''; ?>">
+                    <!-- Users Icon SVG -->
+                    <svg class="menu-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="9" cy="7" r="4"></circle>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                    </svg>
+                    Direktori Pengguna
+                </a>
+                
+                <a href="/admin/history" class="menu-item <?php echo $active_tab === 'history' ? 'active' : ''; ?>">
+                    <!-- History Icon SVG -->
+                    <svg class="menu-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                    Rekod Imbasan
+                </a>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <div class="admin-profile">
+                    <div class="admin-avatar">
+                        <?php echo strtoupper(substr($_SESSION['admin_fullname'] ?? 'A', 0, 1)); ?>
+                    </div>
+                    <div class="admin-info">
+                        <span class="admin-name"><?php echo htmlspecialchars($_SESSION['admin_fullname'] ?? 'Admin RISDA'); ?></span>
+                        <span class="admin-role">Pentadbir RISDA</span>
+                    </div>
+                </div>
+                <a href="/admin/logoutWeb" class="btn-logout" title="Log Keluar">
+                    <!-- Log Out Icon SVG -->
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="16 17 21 12 16 7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                    Log Keluar
+                </a>
+            </div>
+        </aside>
+        
+        <!-- Main Content Area -->
+        <main class="main-content">
+            
+            <!-- Topbar -->
+            <header class="topbar">
+                <div class="topbar-title">
+                    <h1><?php echo $title ?? 'Papan Pemuka'; ?></h1>
+                </div>
+                <div class="topbar-actions">
+                    <span class="live-status-badge">
+                        <span class="badge-dot"></span>
+                        Pelayan Aktif: rubberclone-ai.pats.my
+                    </span>
+                </div>
+            </header>
+            
+            <!-- Dynamic Page Content Starts Here -->
+            <div class="page-content-wrapper">

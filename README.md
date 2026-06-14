@@ -111,11 +111,11 @@ server {
 
 ## 4. Skema Pangkalan Data (MariaDB)
 
-Import skema SQL berikut ke dalam pangkalan data MariaDB anda sebelum menjalankan aplikasi:
+Import skema SQL berikut (atau rujuk fail [schema.sql](file:///home/maui/github/rubberclone.ai/schema.sql)) ke dalam pangkalan data MariaDB anda sebelum menjalankan aplikasi:
 
 ```sql
-CREATE DATABASE IF NOT EXISTS `rubberclone_db` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE `rubberclone_db`;
+CREATE DATABASE IF NOT EXISTS `rubberclone` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE `rubberclone`;
 
 -- 1. Jadual Pengguna & Pentadbir
 CREATE TABLE IF NOT EXISTS `users` (
@@ -150,57 +150,44 @@ CREATE TABLE IF NOT EXISTS `analysis_records` (
   `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- 3. Jadual Tetapan CMS Landing Page
+CREATE TABLE IF NOT EXISTS `cms_settings` (
+  `key` VARCHAR(50) PRIMARY KEY,
+  `value` TEXT NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- 4. Jadual Cerita Blog / Kisah Kejayaan
+CREATE TABLE IF NOT EXISTS `blog_posts` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `title` VARCHAR(255) NOT NULL,
+  `content` TEXT NOT NULL,
+  `image_url` VARCHAR(255) DEFAULT NULL,
+  `author` VARCHAR(100) DEFAULT 'RISDA Pentadbir',
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 ```
+
+> [!NOTE]
+> Sistem ini mempunyai mekanisme **Auto-Seeder** terbina dalam yang akan membina jadual dan memasukkan data tetapan lalai (CMS & sampel Blog Stories) secara automatik semasa melawat halaman buat kali pertama jika pangkalan data kosong.
 
 ---
 
-## 5. Penyusunan Routing dalam `public/index.php`
+## 5. Struktur Routing Utama
 
-Contoh implementasi router ringkas dalam PHP untuk menyokong penulisan URL bersih:
+Sistem ini dibina berasaskan corak reka bentuk MVC ringkas di mana semua laluan dipetakan di dalam `app/core/App.php`:
 
-```php
-<?php
-// public/index.php
-
-// Panggil semua fail core secara automatik
-spl_autoload_register(function ($class) {
-    $paths = ['../app/core/', '../app/controllers/', '../app/models/'];
-    foreach ($paths as $path) {
-        $file = $path . $class . '.php';
-        if (file_exists($file)) {
-            require_once $file;
-            return;
-        }
-    }
-});
-
-// Mulakan router ringkas
-$url = isset($_GET['url']) ? rtrim($_GET['url'], '/') : '';
-
-// Contoh pemetaan laluan (Routing Map)
-$routes = [
-    'api/auth/register' => ['AuthController', 'register'],
-    'api/auth/login'    => ['AuthController', 'login'],
-    'api/analysis/upload' => ['AnalysisController', 'upload'],
-    'api/analysis/list'   => ['AnalysisController', 'list'],
-    'api/analysis/clear'  => ['AnalysisController', 'clear'],
-    'api/admin/users'     => ['AdminController', 'getUsers'],
-    'api/admin/toggle_user' => ['AdminController', 'toggleUserStatus'],
-    'api/admin/stats'     => ['AdminController', 'getStats']
-];
-
-if (array_key_exists($url, $routes)) {
-    $controllerName = $routes[$url][0];
-    $methodName = $routes[$url][1];
-    
-    $controller = new $controllerName();
-    $controller->$methodName();
-} else {
-    // Jika tiada padanan route, semak fail statik atau pulangkan 404
-    http_response_code(404);
-    echo json_encode(["status" => "error", "message" => "Laluan (Route) tidak ditemui."]);
-}
-```
+| Laluan (Route) | Controller / Kaedah | Perihalan |
+| :--- | :--- | :--- |
+| `/` | `HomeController@index` | Paparan Landing Page Dinamik awam |
+| `/pentadbir` | `AdminController@dashboard` | Papan Pemuka Pentadbir / Borang Log Masuk (pintu masuk pentadbir rahsia, disembunyikan dari menu awam) |
+| `/admin/users` | `AdminController@usersView` | Halaman Pengurusan Direktori Pengguna |
+| `/admin/history` | `AdminController@historyView` | Halaman Sejarah Audit & Imbasan Geografi |
+| `/admin/cms` | `AdminController@cmsView` | Halaman Pengurusan CMS (Ubah teks landing & Blog Stories) |
+| `/api/auth/*` | `AuthController` | API pendaftaran & log masuk untuk Android client |
+| `/api/analysis/*` | `AnalysisController` | API upload & senarai analisis daun getah |
+| `/api/admin/*` | `AdminController` | API urus pengguna, CMS, stats dashboard & CRUD Blog Stories |
 
 ---
 
@@ -214,7 +201,7 @@ if (array_key_exists($url, $routes)) {
 ### 6.2 Langkah Pemasangan
 1. **Klon Repositori**:
    ```bash
-   git clone https://github.com/rubberclone-ai/rubberclone.ai.git
+   git clone https://github.com/maui2023/rubberclone.ai.git
    cd rubberclone.ai
    ```
 
@@ -223,18 +210,22 @@ if (array_key_exists($url, $routes)) {
      ```bash
      mysql -u root -p
      ```
-   * Cipta pangkalan data dan import skema SQL:
+   * Cipta pangkalan data `rubberclone` dan import skema SQL:
      ```sql
-     source path/to/schema.sql;
+     CREATE DATABASE IF NOT EXISTS `rubberclone` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+     ```
+   * Anda boleh mengimport skema terus dari fail `schema.sql`:
+     ```bash
+     mysql -u root -p rubberclone < schema.sql
      ```
 
 3. **Konfigurasi Aplikasi**:
    * Ubah suai `app/config/database.php` mengikut hos, nama pengguna, dan kata laluan MariaDB anda:
      ```php
      define('DB_HOST', 'localhost');
-     define('DB_NAME', 'rubberclone_db');
-     define('DB_USER', 'username_anda');
-     define('DB_PASS', 'kata_laluan_anda');
+     define('DB_NAME', 'rubberclone');
+     define('DB_USER', 'rubberclone');
+     define('DB_PASS', '84b28ab2bee03');
      ```
 
 4. **Konfigurasi Web Server**:
@@ -243,7 +234,10 @@ if (array_key_exists($url, $routes)) {
      sudo a2enmod rewrite
      sudo systemctl restart apache2
      ```
-   * Halakan direktori utama (Document Root) hos maya (Virtual Host) anda ke folder `public/`.
+   * Pastikan direktori utama (Document Root) hos maya (Virtual Host) anda dihalakan ke folder `public/`.
 
-5. **Uji Sistem**:
-   * Layari `http://localhost/api/admin/stats` untuk memastikan respons API JSON dipulangkan secara betul.
+5. **Akses Sistem**:
+   * Lawati `/pentadbir` untuk membuka Papan Pemuka Pentadbir.
+   * Akaun Pentadbir Lalai (Auto-Generated jika jadual kosong):
+     * **E-mel**: `admin@demo.com`
+     * **Kata Laluan**: `admin123`

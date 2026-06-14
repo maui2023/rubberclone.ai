@@ -709,6 +709,22 @@
         font-size: 0.85rem;
         color: var(--color-text-muted);
     }
+
+    /* Blog Stories Grid & Hover Animation */
+    .blog-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 2rem;
+        margin-top: 3rem;
+    }
+
+    .blog-image-wrapper img {
+        transition: var(--transition-smooth);
+    }
+
+    .blog-card:hover .blog-image-wrapper img {
+        transform: scale(1.05);
+    }
 }
 
 @layer utilities {

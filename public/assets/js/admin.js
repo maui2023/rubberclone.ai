@@ -15,6 +15,11 @@ document.addEventListener("DOMContentLoaded", function () {
     if (document.getElementById("history-data-table")) {
         initHistoryAudit();
     }
+
+    // 4. Logik Urus Portal & CMS (CMS Management)
+    if (document.getElementById("cms-settings-form")) {
+        initCmsManagement();
+    }
 });
 
 // --- 1. LOGIK PAPAN PEMUKA ---
@@ -433,4 +438,159 @@ function deleteHistoryRecord(recordId) {
     .catch(err => {
         alert("Ralat sambungan pelayan. Gagal memadam rekod.");
     });
+}
+
+// --- 4. LOGIK PENGURUSAN CMS & BLOG ---
+function initCmsManagement() {
+    const cmsForm = document.getElementById("cms-settings-form");
+    const blogForm = document.getElementById("blog-create-form");
+
+    if (cmsForm) {
+        cmsForm.addEventListener("submit", function (e) {
+            e.preventDefault();
+            
+            const formData = new FormData(cmsForm);
+            
+            fetch('/api/admin/update_cms', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(res => {
+                if (res.status === 'success') {
+                    alert(res.message || "Kandungan landing page berjaya dikemas kini.");
+                } else {
+                    alert("Ralat: " + res.message);
+                }
+            })
+            .catch(err => {
+                console.error("Ralat:", err);
+                alert("Ralat sambungan pelayan. Gagal mengemas kini CMS.");
+            });
+        });
+    }
+
+    if (blogForm) {
+        blogForm.addEventListener("submit", function (e) {
+            e.preventDefault();
+            
+            const formData = new FormData(blogForm);
+            
+            fetch('/api/admin/blog/create', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(res => {
+                if (res.status === 'success') {
+                    alert(res.message || "Kisah kejayaan berjaya diterbitkan.");
+                    
+                    // Dapatkan maklumat daripada form untuk diprepend ke jadual
+                    const title = document.getElementById('blog_title').value;
+                    const author = document.getElementById('blog_author').value;
+                    const blogId = res.id;
+                    const imageUrl = res.image_url;
+                    
+                    // Format tarikh hari ini
+                    const options = { day: '2-digit', month: 'short', year: 'numeric' };
+                    const formattedDate = new Date().toLocaleDateString('ms-MY', options);
+
+                    // Buang empty row jika ada
+                    const emptyRow = document.getElementById('blog-empty-row');
+                    if (emptyRow) {
+                        emptyRow.remove();
+                    }
+
+                    const tableBody = document.getElementById('blog-list-table-body');
+                    const tr = document.createElement('tr');
+                    tr.id = `blog-row-${blogId}`;
+                    
+                    const imgHtml = imageUrl 
+                        ? `<img src="/${imageUrl}" alt="" class="table-leaf-thumbnail" style="width: 45px; height: 45px; object-fit: cover;">`
+                        : `<div class="no-image-placeholder" style="width: 45px; height: 45px; font-size: 0.6rem;">Tiada</div>`;
+
+                    tr.innerHTML = `
+                        <td>${imgHtml}</td>
+                        <td style="font-weight:600; color:var(--color-mint-light);">${escapeHtml(title)}</td>
+                        <td>${escapeHtml(author)}</td>
+                        <td style="font-size: 0.8rem;">${formattedDate}</td>
+                        <td>
+                            <button class="btn-action-delete" title="Padam Artikel" onclick="deleteBlogStory(${blogId})">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="3 6 5 6 21 6"></polyline>
+                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                    <line x1="10" y1="11" x2="10" y2="17"></line>
+                                    <line x1="14" y1="11" x2="14" y2="17"></line>
+                                </svg>
+                            </button>
+                        </td>
+                    `;
+                    
+                    // Prepend ke table body
+                    if (tableBody) {
+                        tableBody.insertBefore(tr, tableBody.firstChild);
+                    }
+
+                    // Reset borang
+                    blogForm.reset();
+                } else {
+                    alert("Ralat: " + res.message);
+                }
+            })
+            .catch(err => {
+                console.error("Ralat:", err);
+                alert("Ralat sambungan pelayan. Gagal menerbitkan blog.");
+            });
+        });
+    }
+}
+
+// Memadam kisah blog
+function deleteBlogStory(blogId) {
+    if (!confirm("Adakah anda pasti mahu memadamkan kisah kejayaan ini daripada sistem? Tindakan ini tidak boleh ditarik balik.")) {
+        return;
+    }
+
+    fetch(`/api/admin/blog/delete?id=${blogId}`, {
+        method: 'DELETE'
+    })
+    .then(response => response.json())
+    .then(res => {
+        if (res.status === 'success') {
+            // Buang baris table secara dinamik
+            const row = document.getElementById(`blog-row-${blogId}`);
+            if (row) {
+                row.remove();
+            }
+
+            // Jika tiada baris baki, tambah semula baris kosong
+            const tableBody = document.getElementById('blog-list-table-body');
+            if (tableBody && tableBody.children.length === 0) {
+                const emptyTr = document.createElement('tr');
+                emptyTr.id = 'blog-empty-row';
+                emptyTr.innerHTML = `
+                    <td colspan="5" style="text-align: center; padding: 2rem;">Tiada kisah kejayaan aktif dalam sistem.</td>
+                `;
+                tableBody.appendChild(emptyTr);
+            }
+        } else {
+            alert("Ralat: " + res.message);
+        }
+    })
+    .catch(err => {
+        console.error("Ralat:", err);
+        alert("Ralat sambungan pelayan. Gagal memadam kisah blog.");
+    });
+}
+
+// Fungsi pembantu untuk escape HTML bagi mengelakkan XSS
+function escapeHtml(text) {
+    const map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+    };
+    return text.replace(/[&<>"']/g, function(m) { return map[m]; });
 }

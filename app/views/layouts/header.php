@@ -34,7 +34,7 @@ $active_tab = $active_tab ?? 'dashboard';
             </div>
             
             <nav class="sidebar-menu" aria-label="Menu Pentadbir">
-                <a href="/admin/dashboard" class="menu-item <?php echo $active_tab === 'dashboard' ? 'active' : ''; ?>">
+                <a href="/pentadbir" class="menu-item <?php echo $active_tab === 'dashboard' ? 'active' : ''; ?>">
                     <!-- Grid Icon SVG -->
                     <svg class="menu-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <rect x="3" y="3" width="7" height="7"></rect>
@@ -63,6 +63,15 @@ $active_tab = $active_tab ?? 'dashboard';
                         <polyline points="12 6 12 12 16 14"></polyline>
                     </svg>
                     Rekod Imbasan
+                </a>
+
+                <a href="/admin/cms" class="menu-item <?php echo $active_tab === 'cms' ? 'active' : ''; ?>">
+                    <!-- Settings/Edit Icon SVG -->
+                    <svg class="menu-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                        <path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                    </svg>
+                    Urus Portal (CMS)
                 </a>
             </nav>
             

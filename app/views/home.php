@@ -16,7 +16,7 @@
     <title>Rubber Clone AI - Pengecaman Klon Getah RISDA Pintar</title>
     
     <!-- External Stylesheet -->
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
 
@@ -35,16 +35,9 @@
             <nav class="nav-links" id="navigation-menu" aria-label="Menu Navigasi Utama">
                 <a href="#features" class="nav-link" id="link-features">Ciri-Ciri</a>
                 <a href="#how-it-works" class="nav-link" id="link-how-it-works">Cara Penggunaan</a>
+                <a href="#stories" class="nav-link" id="link-stories">Kisah & Kejayaan</a>
                 <a href="#stats" class="nav-link" id="link-stats">Statistik</a>
-                <a href="https://rubberclone-ai.pats.my" class="btn btn-secondary" id="btn-nav-portal" style="padding: 0.5rem 1.2rem; font-size: 0.9rem;">
-                    Portal Pentadbir
-                    <!-- External Link SVG -->
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-                        <polyline points="15 3 21 3 21 9"></polyline>
-                        <line x1="10" y1="14" x2="21" y2="3"></line>
-                    </svg>
-                </a>
+                <!-- NOTA: Butang Login Admin dikeluarkan dari menu atas arahan keselamatan pentadbiran -->
             </nav>
         </div>
     </header>
@@ -60,10 +53,10 @@
                         Disokong Google Gemini AI
                     </div>
                     <h1 class="hero-title" id="main-heading-title">
-                        Pengecaman Klon Getah RISDA Pintar Menggunakan <span class="hero-title-gradient">Kuasa AI</span>
+                        <?php echo htmlspecialchars($settings['hero_title'] ?? 'Pengecaman Klon Getah RISDA Pintar Menggunakan Kuasa AI'); ?>
                     </h1>
                     <p class="hero-desc" id="hero-description-text">
-                        Inisiatif pintar digital untuk pekebun kecil RISDA dan pegawai lapangan. Kenalpasti klon pokok getah dengan tepat dalam beberapa saat melalui imbasan morfologi daun secara masa nyata.
+                        <?php echo htmlspecialchars($settings['hero_desc'] ?? 'Inisiatif pintar digital untuk pekebun kecil RISDA dan pegawai lapangan. Kenalpasti klon pokok getah dengan tepat dalam beberapa saat melalui imbasan morfologi daun secara masa nyata.'); ?>
                     </p>
                     <div class="hero-ctas" id="hero-actions-container">
                         <a href="https://rubberclone-ai.pats.my/assets/app/rubberclone-ai.apk" class="btn btn-primary" id="btn-download-apk" download="rubberclone-ai.apk">
@@ -75,15 +68,12 @@
                             </svg>
                             Muat Turun APK Android
                         </a>
-                        <a href="https://rubberclone-ai.pats.my" class="btn btn-secondary" id="btn-hero-portal">
-                            Log Masuk Pentadbir
-                        </a>
                     </div>
                 </div>
                 <div class="hero-mockup-wrapper" id="hero-visual-mockup">
                     <div class="mockup-glow"></div>
                     <div class="phone-mockup-container">
-                        <img src="assets/images/rubber_clone_mockup.png" alt="Paparan aplikasi Rubber Clone AI memaparkan hasil pengecaman klon daun getah RRIM 3001 dengan kadar keyakinan 98% berserta cadangan agronomi" id="mockup-image" loading="eager">
+                        <img src="/assets/images/rubber_clone_mockup.png" alt="Paparan aplikasi Rubber Clone AI memaparkan hasil pengecaman klon daun getah RRIM 3001 dengan kadar keyakinan 98% berserta cadangan agronomi" id="mockup-image" loading="eager">
                     </div>
                 </div>
             </div>
@@ -93,15 +83,15 @@
         <section class="stats-section" id="stats">
             <div class="stats-grid" id="stats-counter-grid">
                 <div class="stat-item" id="stat-scans">
-                    <span class="stat-number">1,800+</span>
+                    <span class="stat-number"><?php echo htmlspecialchars($settings['stat_scans'] ?? '1,800+'); ?></span>
                     <span class="stat-label">Imbasan Selesai</span>
                 </div>
                 <div class="stat-item" id="stat-clones">
-                    <span class="stat-number">150+</span>
+                    <span class="stat-number"><?php echo htmlspecialchars($settings['stat_clones'] ?? '150+'); ?></span>
                     <span class="stat-label">Klon Getah Disokong</span>
                 </div>
                 <div class="stat-item" id="stat-officers">
-                    <span class="stat-number">500+</span>
+                    <span class="stat-number"><?php echo htmlspecialchars($settings['stat_officers'] ?? '500+'); ?></span>
                     <span class="stat-label">Pegawai Lapangan RISDA</span>
                 </div>
             </div>
@@ -190,21 +180,40 @@
             </div>
         </section>
 
-        <!-- Admin Action Section -->
-        <section class="admin-action-section" id="admin-action">
-            <div class="admin-card" id="admin-login-callout">
-                <div class="admin-card-content">
-                    <h2 class="admin-card-title">Portal Pentadbiran & Pemantauan RISDA</h2>
-                    <p class="admin-card-desc">Bagi pentadbir dan pegawai atasan RISDA, log masuk ke portal untuk memantau pendaftaran pegawai lapangan, meluluskan sejarah imbasan, dan melihat analisis taburan geografi secara masa nyata.</p>
-                </div>
-                <a href="https://rubberclone-ai.pats.my" class="btn btn-primary" id="btn-admin-portal-login">
-                    Log Masuk Portal
-                    <!-- Arrow Right SVG -->
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="5" y1="12" x2="19" y2="12"></line>
-                        <polyline points="12 5 19 12 12 19"></polyline>
-                    </svg>
-                </a>
+        <!-- Kisah Kejayaan (Blog Stories Section) -->
+        <section class="features-section" id="stories" style="background: linear-gradient(180deg, transparent, rgba(22, 46, 36, 0.1), transparent);">
+            <div class="section-header">
+                <span class="section-subtitle">Laporan Lapangan</span>
+                <h2>Kisah Kejayaan & Cerita Blog</h2>
+                <p class="section-desc">Perkongsian pengalaman dari stesen tapak semaian dan rujukan penyelidikan klon getah RISDA.</p>
+            </div>
+            
+            <div class="blog-grid" id="blog-stories-layout">
+                <?php if (empty($blogs)): ?>
+                    <p style="text-align: center; grid-column: 1/-1; color: var(--color-text-muted); font-style: italic;">Tiada sebarang artikel kisah kejayaan buat masa ini.</p>
+                <?php else: ?>
+                    <?php foreach ($blogs as $post): ?>
+                        <article class="feature-card blog-card" id="blog-card-<?php echo $post['id']; ?>" style="gap: 1rem; padding: 2rem;">
+                            <?php if ($post['image_url']): ?>
+                                <div class="blog-image-wrapper" style="width: 100%; height: 180px; overflow: hidden; border-radius: var(--radius-md); border: 1px solid rgba(255, 255, 255, 0.05); margin-bottom: 0.5rem;">
+                                    <img src="/<?php echo htmlspecialchars($post['image_url']); ?>" alt="<?php echo htmlspecialchars($post['title']); ?>" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            <?php endif; ?>
+                            <span class="hero-badge" style="font-size: 0.7rem; width: fit-content; margin-bottom: 0; padding: 0.15rem 0.6rem; border-color: rgba(16, 185, 129, 0.2); background: rgba(16, 185, 129, 0.05); color: var(--color-emerald);">
+                                <?php echo htmlspecialchars($post['author']); ?>
+                            </span>
+                            <h3 class="feature-title" style="font-size: 1.2rem; line-height: 1.3; margin-top: 0.25rem;">
+                                <?php echo htmlspecialchars($post['title']); ?>
+                            </h3>
+                            <p class="feature-desc" style="font-size: 0.85rem; line-height: 1.5; color: var(--color-text-secondary);">
+                                <?php echo htmlspecialchars($post['content']); ?>
+                            </p>
+                            <span style="font-size: 0.75rem; color: var(--color-text-muted);">
+                                <?php echo date('d M Y', strtotime($post['created_at'])); ?>
+                            </span>
+                        </article>
+                    <?php endforeach; ?>
+                <?php endif; ?>
             </div>
         </section>
 

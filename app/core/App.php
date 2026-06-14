@@ -2,8 +2,8 @@
 // app/core/App.php
 
 class App {
-    protected $controller = 'AdminController';
-    protected $method = 'dashboard';
+    protected $controller = 'HomeController';
+    protected $method = 'index';
     protected $params = [];
 
     public function __construct() {
@@ -12,6 +12,10 @@ class App {
         // Pemetaan Laluan (Routing Map)
         // Format: 'path' => ['Controller', 'Method', 'HTTP_METHOD']
         $routes = [
+            // 0. Laluan Awam (Public Views & Blog API)
+            ''                      => ['HomeController', 'index', 'GET'],
+            'api/blog/list'         => ['HomeController', 'getBlogPosts', 'GET'],
+
             // 1. Laluan API Pengesahan (Auth Endpoints)
             'api/auth/register'     => ['AuthController', 'register', 'POST'],
             'api/auth/login'        => ['AuthController', 'login', 'POST'],
@@ -26,16 +30,22 @@ class App {
             'api/admin/users'       => ['AdminController', 'getUsers', 'GET'],
             'api/admin/toggle_user' => ['AdminController', 'toggleUserStatus', 'POST'],
             'api/admin/stats'       => ['AdminController', 'getStats', 'GET'],
+            'api/admin/update_cms'  => ['AdminController', 'updateCms', 'POST'],
+            'api/admin/blog/create' => ['AdminController', 'createBlogPost', 'POST'],
+            'api/admin/blog/delete' => ['AdminController', 'deleteBlogPost', 'DELETE'],
             
             // 4. Halaman Web Portal Pentadbir (Admin Web Views)
-            'admin/dashboard'       => ['AdminController', 'dashboard', 'GET'],
+            'pentadbir'             => ['AdminController', 'dashboard', 'GET'],
             'admin/users'           => ['AdminController', 'usersView', 'GET'],
-            'admin/history'         => ['AdminController', 'historyView', 'GET']
+            'admin/history'         => ['AdminController', 'historyView', 'GET'],
+            'admin/cms'             => ['AdminController', 'cmsView', 'GET'],
+            'admin/loginWeb'        => ['AdminController', 'loginWeb', 'POST'],
+            'admin/logoutWeb'       => ['AdminController', 'logoutWeb', 'GET']
         ];
 
-        // Jika melawat root folder '/' pada public, hala ke login/dashboard
+        // Jika melawat root folder '/' pada public, hala ke halaman utama dinamik
         if (empty($url)) {
-            $url = 'admin/dashboard';
+            $url = '';
         }
 
         if (array_key_exists($url, $routes)) {
@@ -80,7 +90,7 @@ class App {
                 echo "<div style='font-family: sans-serif; text-align: center; padding: 4rem; color: #333;'>";
                 echo "<h1>404 - Halaman Tidak Ditemui</h1>";
                 echo "<p>Maaf, halaman yang anda cari tiada di dalam sistem.</p>";
-                echo "<p><a href='/admin/dashboard' style='color: #10B981; font-weight: bold;'>Kembali ke Papan Pemuka Pentadbir</a></p>";
+                echo "<p><a href='/pentadbir' style='color: #10B981; font-weight: bold;'>Kembali ke Papan Pemuka Pentadbir</a></p>";
                 echo "</div>";
             }
             exit;

@@ -68,7 +68,7 @@ class AdminController extends Controller {
                 $_SESSION['admin_fullname'] = $user['fullname'];
                 $_SESSION['admin_role'] = $user['role'];
 
-                header("Location: /admin/dashboard");
+                header("Location: /pentadbir");
                 exit;
             } else {
                 $this->view('admin/login', [
@@ -79,7 +79,7 @@ class AdminController extends Controller {
             }
         }
         
-        header("Location: /admin/dashboard");
+        header("Location: /pentadbir");
         exit;
     }
 
@@ -90,7 +90,7 @@ class AdminController extends Controller {
         unset($_SESSION['admin_fullname']);
         unset($_SESSION['admin_role']);
         session_destroy();
-        header("Location: /admin/dashboard");
+        header("Location: /pentadbir");
         exit;
     }
 
@@ -262,8 +262,137 @@ class AdminController extends Controller {
                     $this->analysisModel->create($mScan);
                 }
             }
-        } catch (PDOException $e) {
-            // Abaikan ralat ini, ia akan ditangkap di core/Database
+        } catch (Exception $e) {
+            // Abaikan jika pangkalan data atau jadual belum wujud
+        }
+    }
+
+    // Paparan Halaman Urus CMS & Blog (GET /admin/cms)
+    public function cmsView() {
+        $this->checkWebAuth();
+        
+        $cmsModel = $this->model('CmsSetting');
+        $blogModel = $this->model('BlogPost');
+        
+        $settings = $cmsModel->getAll();
+        $blogs = $blogModel->getAll();
+
+        $this->view('admin/cms', [
+            'title' => 'Urus Portal & CMS - Rubber Clone AI',
+            'active_tab' => 'cms',
+            'settings' => $settings,
+            'blogs' => $blogs
+        ]);
+    }
+
+    // Kemas kini konfigurasi CMS (POST /api/admin/update_cms)
+    public function updateCms() {
+        $this->checkApiAuth();
+
+        $cmsModel = $this->model('CmsSetting');
+        
+        $hero_title = $_POST['hero_title'] ?? null;
+        $hero_desc = $_POST['hero_desc'] ?? null;
+        $stat_scans = $_POST['stat_scans'] ?? null;
+        $stat_clones = $_POST['stat_clones'] ?? null;
+        $stat_officers = $_POST['stat_officers'] ?? null;
+
+        if (!$hero_title) {
+            $input = json_decode(file_get_contents('php://input'), true);
+            if ($input) {
+                $hero_title = $input['hero_title'] ?? null;
+                $hero_desc = $input['hero_desc'] ?? null;
+                $stat_scans = $input['stat_scans'] ?? null;
+                $stat_clones = $input['stat_clones'] ?? null;
+                $stat_officers = $input['stat_officers'] ?? null;
+            }
+        }
+
+        if (!$hero_title || !$hero_desc || !$stat_scans || !$stat_clones || !$stat_officers) {
+            $this->jsonResponse(["status" => "error", "message" => "Semua medan CMS wajib diisi."], 400);
+        }
+
+        $cmsModel->updateKey('hero_title', $hero_title);
+        $cmsModel->updateKey('hero_desc', $hero_desc);
+        $cmsModel->updateKey('stat_scans', $stat_scans);
+        $cmsModel->updateKey('stat_clones', $stat_clones);
+        $cmsModel->updateKey('stat_officers', $stat_officers);
+
+        $this->jsonResponse(["status" => "success", "message" => "Kandungan landing page berjaya dikemas kini."]);
+    }
+
+    // Membina Blog Story baharu (POST /api/admin/blog/create)
+    public function createBlogPost() {
+        $this->checkApiAuth();
+
+        $blogModel = $this->model('BlogPost');
+
+        $title = $_POST['title'] ?? null;
+        $content = $_POST['content'] ?? null;
+        $author = $_POST['author'] ?? 'RISDA Pentadbir';
+
+        if (!$title || !$content) {
+            $this->jsonResponse(["status" => "error", "message" => "Tajuk dan kandungan blog wajib diisi."], 400);
+        }
+
+        $data = [
+            'title' => $title,
+            'content' => $content,
+            'author' => $author,
+            'image_url' => null
+        ];
+
+        // Kendalikan muat naik fail imej jika disediakan
+        if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+            $fileTmpPath = $_FILES['image']['tmp_name'];
+            $fileName = $_FILES['image']['name'];
+            $fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+
+            $allowedExtensions = ['jpg', 'jpeg', 'png', 'webp'];
+            if (in_array($fileExtension, $allowedExtensions)) {
+                $uploadDir = __DIR__ . '/../../public/uploads/';
+                if (!is_dir($uploadDir)) {
+                    mkdir($uploadDir, 0755, true);
+                }
+
+                $newFileName = 'blog_' . time() . '.' . $fileExtension;
+                $destPath = $uploadDir . $newFileName;
+
+                if (move_uploaded_file($fileTmpPath, $destPath)) {
+                    $data['image_url'] = "uploads/" . $newFileName;
+                }
+            }
+        }
+
+        $resultId = $blogModel->create($data);
+        if ($resultId) {
+            $this->jsonResponse([
+                "status" => "success", 
+                "message" => "Kisah kejayaan berjaya diterbitkan.", 
+                "id" => (int)$resultId,
+                "image_url" => $data['image_url']
+            ]);
+        } else {
+            $this->jsonResponse(["status" => "error", "message" => "Gagal menerbitkan kisah blog."], 500);
+        }
+    }
+
+    // Memadam Blog Story (DELETE /api/admin/blog/delete?id={id})
+    public function deleteBlogPost() {
+        $this->checkApiAuth();
+
+        $blogModel = $this->model('BlogPost');
+
+        $id = $_GET['id'] ?? null;
+        if (!$id) {
+            $this->jsonResponse(["status" => "error", "message" => "ID kisah blog wajib dibekalkan."], 400);
+        }
+
+        $result = $blogModel->delete($id);
+        if ($result) {
+            $this->jsonResponse(["status" => "success", "message" => "Kisah blog berjaya dipadamkan."]);
+        } else {
+            $this->jsonResponse(["status" => "error", "message" => "Gagal memadam kisah blog."], 500);
         }
     }
 }

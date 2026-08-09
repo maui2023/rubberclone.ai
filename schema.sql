@@ -55,3 +55,33 @@ CREATE TABLE IF NOT EXISTS `blog_posts` (
   `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- 5. Table: clone_samples
+CREATE TABLE IF NOT EXISTS `clone_samples` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `clone_name` VARCHAR(50) NOT NULL,
+  `warisan` VARCHAR(100),
+  `potensi_hasil` VARCHAR(50),
+  `anggaran_kayu` VARCHAR(50),
+  `bentuk_daun` VARCHAR(100),
+  `bentuk_hujung_daun` VARCHAR(100),
+  `bentuk_pangkal_daun` VARCHAR(100),
+  `kedudukan_lai_daun` VARCHAR(100),
+  `bentuk_tepi_daun` VARCHAR(100),
+  `warna_daun_kilauan` VARCHAR(100),
+  `permukaan_daun` VARCHAR(100),
+  `pandangan_memanjang` VARCHAR(100),
+  `pandangan_melintang` VARCHAR(100),
+  `saiz_gagang_daun` VARCHAR(100),
+  `saiz_anak_gagang` VARCHAR(100),
+  `warna_lateks` VARCHAR(100),
+  `status` ENUM('active','inactive') DEFAULT 'active',
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- 5.1 Seed Data: 3 Klon Getah Sebenar (PB 350, PB 260, RRIM 2002)
+INSERT INTO `clone_samples` (`clone_name`, `warisan`, `potensi_hasil`, `anggaran_kayu`, `bentuk_daun`, `bentuk_hujung_daun`, `bentuk_pangkal_daun`, `kedudukan_lai_daun`, `bentuk_tepi_daun`, `warna_daun_kilauan`, `permukaan_daun`, `pandangan_memanjang`, `pandangan_melintang`, `saiz_gagang_daun`, `saiz_anak_gagang`, `warna_lateks`) VALUES
+('PB 350', 'RRIM 600 × PB 235', '2,765', '19T/1.6', 'Bulat (rounded)', 'Kuspidat (Cuspidate)', 'Bulat (Obtuse)', 'Bersentuh ke bertindih', 'Gelombang', 'Hijau tua, sedikit berkilat', 'Licin', 'Rata/Selanjar', 'Rata', 'Sederhana panjang, rata', 'Pendek dan rata', 'Putih'),
+('PB 260', 'PB5/51 × PB49', '2,675', '1.29/pokok', 'Bujur telur (Obovate) ke Bujur sama (Elliptical)', 'Akuminat (Accuminate)', 'Baji/Tirus (Cuneate)', 'Terpisah ke Bersentuhan', 'Keriting', 'Hijau muda/kekuningan, sedikit berkilat', 'Kasar', 'Menurun', 'Bentuk perahu (boat shape)', 'Sederhana panjang dan rata', 'Sederhana panjang dan menurun', 'Krim'),
+('RRIM 2002', 'PB 5/51 × FORD 351', '2,348', '17Th/1.10', 'Bujur sama (Elliptical)', 'Akuminat (Acuminate)', 'Bulat (Obtuse)', 'Bersentuhan ke bertindih', 'Licin', 'Hijau muda, sedikit berkilat', 'Licin', 'Rata/Selanjar', 'Bentuk perahu (boat shape)', 'Sederhana panjang, rata', 'Pendek, rata', 'Kekuningan (yellowish)');

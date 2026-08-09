@@ -26,6 +26,12 @@ class App {
             'api/analysis/list'     => ['AnalysisController', 'list', 'GET'],
             'api/analysis/delete'   => ['AnalysisController', 'delete', 'DELETE'],
             'api/analysis/clear'    => ['AnalysisController', 'clear', 'POST'],
+
+            // 2.5. Laluan API Sampel Klon Getah (Clone Sample Endpoints)
+            'api/clone-samples/list'   => ['CloneSampleController', 'list', 'GET'],
+            'api/clone-samples/create' => ['CloneSampleController', 'create', 'POST'],
+            'api/clone-samples/update' => ['CloneSampleController', 'update', 'POST'],
+            'api/clone-samples/delete' => ['CloneSampleController', 'delete', 'DELETE'],
             
             // 3. Laluan API Pentadbir (Admin Endpoints)
             'api/admin/users'       => ['AdminController', 'getUsers', 'GET'],

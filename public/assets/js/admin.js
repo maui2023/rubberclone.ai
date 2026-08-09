@@ -38,6 +38,11 @@ document.addEventListener("DOMContentLoaded", function () {
     if (document.getElementById("clones-data-table")) {
         initCloneSamples();
     }
+
+    // 6. Logik Pengurusan Pekeliling & Makluman (Announcements Management)
+    if (document.getElementById("announcements-data-table")) {
+        initAnnouncements();
+    }
 });
 
 // --- 1. LOGIK PAPAN PEMUKA ---
@@ -176,10 +181,16 @@ function initUsersDirectory() {
     const addUserForm = document.getElementById('add-user-form');
     const errorDiv = document.getElementById('add-user-error');
     const btnSubmit = document.getElementById('btn-submit-add-user');
+    const modalTitle = document.getElementById('user-modal-title');
+    const modalDesc = document.getElementById('user-modal-desc');
+    const editIdField = document.getElementById('edit-user-id');
+    const passwordHelp = document.getElementById('reg-password-help');
+    const avatarContainer = document.getElementById('avatar-preview-container');
+    const avatarImg = document.getElementById('user-avatar-img');
 
     // Mengambil data senarai pengguna secara dinamik
     function fetchAndRenderUsers() {
-        tableBody.innerHTML = `<tr><td colspan="7" class="table-loading-row"><span class="spinner"></span> Memuatkan rekod pendaftaran pengguna...</td></tr>`;
+        tableBody.innerHTML = `<tr><td colspan="8" class="table-loading-row"><span class="spinner"></span> Memuatkan rekod pendaftaran pengguna...</td></tr>`;
         fetch(getApiUrl('api/admin/users'))
             .then(response => response.json())
             .then(res => {
@@ -188,12 +199,12 @@ function initUsersDirectory() {
                     renderUsersTable(allUsers);
                 } else {
                     allUsers = [];
-                    tableBody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:#ef4444;">${res.message}</td></tr>`;
+                    tableBody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:#ef4444;">${res.message}</td></tr>`;
                 }
             })
             .catch(err => {
                 allUsers = [];
-                tableBody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:#ef4444;">Ralat sambungan pelayan. Anda masih boleh menambah pengguna secara demonstrasi dalam UI.</td></tr>`;
+                tableBody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:#ef4444;">Ralat sambungan pelayan. Anda masih boleh menambah pengguna secara demonstrasi dalam UI.</td></tr>`;
             });
     }
 
@@ -211,12 +222,18 @@ function initUsersDirectory() {
         renderUsersTable(filtered);
     });
 
-    // Urus Modal Tunjuk/Sembunyi
+    // Urus Modal Tunjuk/Sembunyi (Tambah Pengguna)
     if (btnAddUser && modal) {
         btnAddUser.addEventListener('click', () => {
-            modal.style.display = 'flex';
+            modalTitle.innerText = 'Daftar Pengguna Baharu';
+            modalDesc.innerText = 'Cipta akaun pegawai lapangan atau pentadbir RISDA secara selamat.';
+            btnSubmit.innerText = 'Daftar Pengguna';
+            editIdField.value = '';
+            if (passwordHelp) passwordHelp.style.display = 'none';
+            if (avatarContainer) avatarContainer.style.display = 'none';
             errorDiv.style.display = 'none';
             addUserForm.reset();
+            modal.style.display = 'flex';
         });
     }
 
@@ -233,11 +250,14 @@ function initUsersDirectory() {
         });
     }
 
-    // Urus Hantar Borang (Submit Form)
+    // Urus Hantar Borang (Submit Form - Create or Update)
     if (addUserForm) {
         addUserForm.addEventListener('submit', function (e) {
             e.preventDefault();
             
+            const editId = editIdField.value;
+            const isEdit = editId !== '';
+
             const formData = {
                 fullname: document.getElementById('reg-fullname').value,
                 username: document.getElementById('reg-username').value,
@@ -248,28 +268,17 @@ function initUsersDirectory() {
                 status: document.getElementById('reg-status').value
             };
 
-            const fallbackAdd = () => {
-                const newUser = {
-                    id: Date.now(),
-                    fullname: formData.fullname,
-                    username: formData.username,
-                    email: formData.email,
-                    agency: formData.agency,
-                    role: formData.role,
-                    status: formData.status,
-                    total_scans: 0
-                };
-                allUsers.unshift(newUser);
-                renderUsersTable(allUsers);
-                modal.style.display = 'none';
-                addUserForm.reset();
-            };
+            if (isEdit) {
+                formData.user_id = parseInt(editId);
+            }
 
             errorDiv.style.display = 'none';
             btnSubmit.disabled = true;
-            btnSubmit.innerHTML = 'Mendaftarkan...';
+            btnSubmit.innerHTML = isEdit ? 'Mengemaskini...' : 'Mendaftarkan...';
 
-            fetch(getApiUrl('api/admin/create_user'), {
+            const apiEndpoint = isEdit ? 'api/admin/update_user' : 'api/admin/create_user';
+
+            fetch(getApiUrl(apiEndpoint), {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -279,22 +288,23 @@ function initUsersDirectory() {
             .then(response => response.json())
             .then(res => {
                 btnSubmit.disabled = false;
-                btnSubmit.innerHTML = 'Daftar Pengguna';
+                btnSubmit.innerHTML = isEdit ? 'Kemas Kini Pengguna' : 'Daftar Pengguna';
                 
                 if (res.status === 'success') {
                     modal.style.display = 'none';
                     addUserForm.reset();
+                    editIdField.value = '';
                     fetchAndRenderUsers();
                 } else {
-                    // Fallback to UI-only addition if DB or server error occurs
-                    fallbackAdd();
+                    errorDiv.innerText = res.message || 'Ralat semasa memproses maklumat pengguna.';
+                    errorDiv.style.display = 'block';
                 }
             })
             .catch(err => {
                 btnSubmit.disabled = false;
-                btnSubmit.innerHTML = 'Daftar Pengguna';
-                // Fallback to UI-only addition on network error
-                fallbackAdd();
+                btnSubmit.innerHTML = isEdit ? 'Kemas Kini Pengguna' : 'Daftar Pengguna';
+                errorDiv.innerText = 'Ralat sambungan pelayan. Gagal menyimpan data.';
+                errorDiv.style.display = 'block';
             });
         });
     }
@@ -304,7 +314,7 @@ function renderUsersTable(usersList) {
     const tableBody = document.getElementById('users-table-body');
     
     if (usersList.length === 0) {
-        tableBody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding: 2rem;">Tiada pengguna ditemui.</td></tr>`;
+        tableBody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding: 2rem;">Tiada pengguna ditemui.</td></tr>`;
         return;
     }
 
@@ -313,27 +323,84 @@ function renderUsersTable(usersList) {
         const isChecked = user.status === 'active' ? 'checked' : '';
         const badgeClass = user.status === 'active' ? 'active' : 'inactive';
         const badgeLabel = user.status === 'active' ? 'Aktif' : 'Nyahaktif';
+        const initial = (user.fullname || 'U').charAt(0).toUpperCase();
+
+        const avatarHtml = user.avatar_url 
+            ? `<img src="${user.avatar_url}" alt="${escapeHtml(user.fullname)}" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 1.5px solid var(--color-emerald); box-shadow: 0 0 8px var(--color-emerald-glow);">`
+            : `<div class="admin-avatar" style="width: 36px; height: 36px; font-size: 0.85rem; border-radius: 50%; background: var(--color-emerald); color: var(--color-bg-dark); font-weight: 700; display: flex; align-items: center; justify-content: center;">${initial}</div>`;
 
         const tr = document.createElement('tr');
         tr.innerHTML = `
-            <td style="font-weight:600; color:var(--color-mint-light);">${user.fullname}</td>
-            <td>@${user.username}</td>
-            <td>${user.email}</td>
-            <td>${user.agency}</td>
+            <td>${avatarHtml}</td>
+            <td style="font-weight:600; color:var(--color-mint-light);">${escapeHtml(user.fullname)}</td>
+            <td>@${escapeHtml(user.username)}</td>
+            <td>${escapeHtml(user.email)}</td>
+            <td>${escapeHtml(user.agency)}</td>
             <td style="text-align:center; font-weight:bold;">${user.total_scans}</td>
             <td>
                 <span class="status-badge ${badgeClass}" id="badge-status-${user.id}">${badgeLabel}</span>
             </td>
             <td>
-                <!-- Suis Togol Pintar -->
-                <label class="switch" aria-label="Tukar status akses pengguna">
-                    <input type="checkbox" ${isChecked} onchange="toggleUserAccess(${user.id}, this)">
-                    <span class="slider"></span>
-                </label>
+                <div style="display:flex; align-items:center; gap:0.5rem;">
+                    <button class="btn-action-edit" title="Sunting Pengguna" onclick="editUser(${user.id})" style="padding: 0.4rem; border-radius: var(--radius-sm); color: var(--color-text-muted); display: inline-flex; align-items: center; justify-content: center; transition: var(--transition-smooth); border: 1px solid transparent; background: none; cursor: pointer;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                            <path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                        </svg>
+                    </button>
+                    <!-- Suis Togol Pintar -->
+                    <label class="switch" aria-label="Tukar status akses pengguna">
+                        <input type="checkbox" ${isChecked} onchange="toggleUserAccess(${user.id}, this)">
+                        <span class="slider"></span>
+                    </label>
+                </div>
             </td>
         `;
         tableBody.appendChild(tr);
     });
+}
+
+// Membuka modal sunting pengguna dengan data sedia ada & paparan gambar profil
+function editUser(userId) {
+    const user = allUsers.find(u => u.id === userId);
+    if (!user) return;
+
+    const modal = document.getElementById('add-user-modal');
+    const modalTitle = document.getElementById('user-modal-title');
+    const modalDesc = document.getElementById('user-modal-desc');
+    const btnSubmit = document.getElementById('btn-submit-add-user');
+    const editIdField = document.getElementById('edit-user-id');
+    const passwordHelp = document.getElementById('reg-password-help');
+    const errorDiv = document.getElementById('add-user-error');
+    const avatarContainer = document.getElementById('avatar-preview-container');
+    const avatarImg = document.getElementById('user-avatar-img');
+
+    modalTitle.innerText = `Kemaskini Profil Pengguna`;
+    modalDesc.innerText = `Sunting maklumat pegawai atau pentadbir: ${user.fullname}`;
+    btnSubmit.innerText = 'Kemas Kini Pengguna';
+    editIdField.value = user.id;
+    errorDiv.style.display = 'none';
+
+    // Isi borang dengan data sedia ada
+    document.getElementById('reg-fullname').value = user.fullname || '';
+    document.getElementById('reg-username').value = user.username || '';
+    document.getElementById('reg-email').value = user.email || '';
+    document.getElementById('reg-agency').value = user.agency || '';
+    document.getElementById('reg-role').value = user.role || 'user';
+    document.getElementById('reg-status').value = user.status || 'active';
+    document.getElementById('reg-password').value = '';
+
+    if (passwordHelp) passwordHelp.style.display = 'block';
+
+    // Paparkan gambar profil jika dimuat naik
+    if (user.avatar_url && avatarContainer && avatarImg) {
+        avatarImg.src = user.avatar_url;
+        avatarContainer.style.display = 'flex';
+    } else if (avatarContainer) {
+        avatarContainer.style.display = 'none';
+    }
+
+    modal.style.display = 'flex';
 }
 
 // Menukar status akses pengguna (Enable/Disable)
@@ -1007,3 +1074,287 @@ function deleteClone(cloneId, cloneName) {
         alert("Ralat sambungan pelayan. Gagal memadam sampel klon.");
     });
 }
+
+// --- 6. LOGIK PENGURUSAN PEKELILING & MAKLUMAN ---
+let allAnnouncements = [];
+
+function initAnnouncements() {
+    const tableBody = document.getElementById('announcements-table-body');
+    const searchInput = document.getElementById('search-announcements-input');
+    const modal = document.getElementById('announcement-modal');
+    const detailModal = document.getElementById('announcement-detail-modal');
+    const btnAddAnnouncement = document.getElementById('btn-add-announcement');
+    const btnCloseModal = document.getElementById('btn-close-announcement-modal');
+    const closeDetailBtn = document.getElementById('close-announcement-detail-btn');
+    const announcementForm = document.getElementById('announcement-form');
+    const errorDiv = document.getElementById('announcement-form-error');
+    const btnSubmit = document.getElementById('btn-submit-announcement');
+    const modalTitle = document.getElementById('announcement-modal-title');
+    const editIdField = document.getElementById('announcement-edit-id');
+
+    function fetchAndRenderAnnouncements() {
+        tableBody.innerHTML = `<tr><td colspan="6" class="table-loading-row"><span class="spinner"></span> Memuatkan senarai pekeliling & makluman...</td></tr>`;
+        fetch(getApiUrl('api/announcements/list_all'))
+            .then(response => response.json())
+            .then(res => {
+                if (res.status === 'success') {
+                    allAnnouncements = res.data;
+                    renderAnnouncementsTable(allAnnouncements);
+                } else {
+                    allAnnouncements = [];
+                    tableBody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#ef4444;">${res.message}</td></tr>`;
+                }
+            })
+            .catch(err => {
+                allAnnouncements = [];
+                tableBody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#ef4444;">Ralat sambungan pelayan. Sila semak sambungan pangkalan data.</td></tr>`;
+            });
+    }
+
+    fetchAndRenderAnnouncements();
+
+    // Carian pekeliling masa nyata
+    if (searchInput) {
+        searchInput.addEventListener('input', function () {
+            const query = searchInput.value.toLowerCase();
+            const filtered = allAnnouncements.filter(item =>
+                item.title.toLowerCase().includes(query) ||
+                (item.content && item.content.toLowerCase().includes(query)) ||
+                (item.author && item.author.toLowerCase().includes(query))
+            );
+            renderAnnouncementsTable(filtered);
+        });
+    }
+
+    // Modal Tambah Pekeliling
+    if (btnAddAnnouncement && modal) {
+        btnAddAnnouncement.addEventListener('click', () => {
+            modalTitle.innerText = 'Tambah Pekeliling Baharu';
+            btnSubmit.innerText = 'Terbitkan Pekeliling';
+            editIdField.value = '';
+            errorDiv.style.display = 'none';
+            announcementForm.reset();
+            modal.style.display = 'flex';
+        });
+    }
+
+    if (btnCloseModal && modal) {
+        btnCloseModal.addEventListener('click', () => {
+            modal.style.display = 'none';
+        });
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) modal.style.display = 'none';
+        });
+    }
+
+    if (closeDetailBtn && detailModal) {
+        closeDetailBtn.addEventListener('click', () => detailModal.style.display = 'none');
+        detailModal.addEventListener('click', (e) => {
+            if (e.target === detailModal) detailModal.style.display = 'none';
+        });
+    }
+
+    // Submit form (Create / Update)
+    if (announcementForm) {
+        announcementForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const editId = editIdField.value;
+            const isEdit = editId !== '';
+
+            const publishDateVal = document.getElementById('announcement-publish-date').value;
+            const expireDateVal = document.getElementById('announcement-expire-date').value;
+
+            const publishAtMs = publishDateVal ? new Date(publishDateVal).getTime() : Date.now();
+            const expiresAtMs = expireDateVal ? new Date(expireDateVal).getTime() : null;
+
+            const formData = {
+                title: document.getElementById('announcement-title').value,
+                content: document.getElementById('announcement-content').value,
+                publish_at: publishAtMs,
+                expires_at: expiresAtMs,
+                status: document.getElementById('announcement-status').value
+            };
+
+            if (isEdit) {
+                formData.id = parseInt(editId);
+            }
+
+            errorDiv.style.display = 'none';
+            btnSubmit.disabled = true;
+            btnSubmit.innerHTML = isEdit ? 'Mengemaskini...' : 'Menerbitkan...';
+
+            const apiPath = isEdit ? 'api/announcements/update' : 'api/announcements/create';
+
+            fetch(getApiUrl(apiPath), {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => response.json())
+            .then(res => {
+                btnSubmit.disabled = false;
+                btnSubmit.innerHTML = isEdit ? 'Kemas Kini Pekeliling' : 'Terbitkan Pekeliling';
+
+                if (res.status === 'success') {
+                    modal.style.display = 'none';
+                    announcementForm.reset();
+                    editIdField.value = '';
+                    fetchAndRenderAnnouncements();
+                } else {
+                    errorDiv.innerText = res.message || 'Ralat semasa memproses pekeliling.';
+                    errorDiv.style.display = 'block';
+                }
+            })
+            .catch(err => {
+                btnSubmit.disabled = false;
+                btnSubmit.innerHTML = isEdit ? 'Kemas Kini Pekeliling' : 'Terbitkan Pekeliling';
+                errorDiv.innerText = 'Ralat sambungan pelayan. Gagal menyimpan pekeliling.';
+                errorDiv.style.display = 'block';
+            });
+        });
+    }
+}
+
+function renderAnnouncementsTable(list) {
+    const tableBody = document.getElementById('announcements-table-body');
+
+    if (list.length === 0) {
+        tableBody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding: 2rem;">Tiada pekeliling atau makluman ditemui.</td></tr>`;
+        return;
+    }
+
+    tableBody.innerHTML = '';
+    list.forEach(item => {
+        const publishStr = item.publish_at ? new Date(item.publish_at).toLocaleDateString('ms-MY') : '-';
+        const expireStr = item.expires_at ? new Date(item.expires_at).toLocaleDateString('ms-MY') : 'Tiada';
+        const badgeClass = item.status === 'active' ? 'active' : 'inactive';
+        const badgeLabel = item.status === 'active' ? 'Aktif' : 'Draf/Nyahaktif';
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td style="font-weight:600; color:var(--color-mint-light); cursor:pointer;" onclick="viewAnnouncementDetail(${item.id})" title="Klik untuk lihat kandungan penuh">${escapeHtml(item.title)}</td>
+            <td style="font-size:0.85rem;">${escapeHtml(item.author || 'Pentadbir')}</td>
+            <td style="font-size:0.85rem;">${publishStr}</td>
+            <td style="font-size:0.85rem;">${expireStr}</td>
+            <td>
+                <span class="status-badge ${badgeClass}">${badgeLabel}</span>
+            </td>
+            <td>
+                <div style="display:flex; gap:0.5rem;">
+                    <button class="btn-action-edit" title="Sunting Pekeliling" onclick="editAnnouncement(${item.id})" style="padding: 0.4rem; border-radius: var(--radius-sm); color: var(--color-text-muted); display: inline-flex; align-items: center; justify-content: center; transition: var(--transition-smooth); border: 1px solid transparent; background: none; cursor: pointer;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                            <path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                        </svg>
+                    </button>
+                    <button class="btn-action-delete" title="Padam Pekeliling" onclick="deleteAnnouncement(${item.id}, '${escapeHtml(item.title)}')">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="3 6 5 6 21 6"></polyline>
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                            <line x1="10" y1="11" x2="10" y2="17"></line>
+                            <line x1="14" y1="11" x2="14" y2="17"></line>
+                        </svg>
+                    </button>
+                </div>
+            </td>
+        `;
+        tableBody.appendChild(tr);
+    });
+}
+
+function viewAnnouncementDetail(id) {
+    const item = allAnnouncements.find(a => a.id === id);
+    if (!item) return;
+
+    const modal = document.getElementById('announcement-detail-modal');
+    const titleEl = document.getElementById('detail-announcement-title');
+    const bodyEl = document.getElementById('detail-announcement-body');
+
+    titleEl.innerText = item.title;
+
+    const publishStr = item.publish_at ? new Date(item.publish_at).toLocaleString('ms-MY') : '-';
+    const expireStr = item.expires_at ? new Date(item.expires_at).toLocaleString('ms-MY') : 'Tiada';
+
+    bodyEl.innerHTML = `
+        <div class="modal-field">
+            <span class="modal-field-label">Pengarang</span>
+            <span class="modal-field-val" style="font-weight:600;">${escapeHtml(item.author || 'RISDA Pentadbir')}</span>
+        </div>
+        <div class="modal-field">
+            <span class="modal-field-label">Tarikh Siaran & Luput</span>
+            <span class="modal-field-val">${publishStr} &rarr; ${expireStr}</span>
+        </div>
+        <div class="modal-field">
+            <span class="modal-field-label">Status</span>
+            <span class="modal-field-val"><span class="status-badge ${item.status === 'active' ? 'active' : 'inactive'}">${item.status === 'active' ? 'Aktif' : 'Draf/Nyahaktif'}</span></span>
+        </div>
+        <div class="modal-field" style="margin-top: 1rem;">
+            <span class="modal-field-label">Kandungan Pekeliling</span>
+            <div class="modal-field-val" style="white-space: pre-line; background: rgba(255,255,255,0.02); padding: 1rem; border-radius: var(--radius-sm); border: 1px solid rgba(255,255,255,0.04); margin-top: 0.5rem; line-height: 1.6;">${escapeHtml(item.content)}</div>
+        </div>
+    `;
+
+    modal.style.display = 'flex';
+}
+
+function editAnnouncement(id) {
+    const item = allAnnouncements.find(a => a.id === id);
+    if (!item) return;
+
+    const modal = document.getElementById('announcement-modal');
+    const modalTitle = document.getElementById('announcement-modal-title');
+    const btnSubmit = document.getElementById('btn-submit-announcement');
+    const editIdField = document.getElementById('announcement-edit-id');
+    const errorDiv = document.getElementById('announcement-form-error');
+
+    modalTitle.innerText = `Sunting Pekeliling`;
+    btnSubmit.innerText = 'Kemas Kini Pekeliling';
+    editIdField.value = item.id;
+    errorDiv.style.display = 'none';
+
+    document.getElementById('announcement-title').value = item.title || '';
+    document.getElementById('announcement-content').value = item.content || '';
+    document.getElementById('announcement-status').value = item.status || 'active';
+
+    if (item.publish_at) {
+        const pDate = new Date(item.publish_at);
+        document.getElementById('announcement-publish-date').value = pDate.toISOString().split('T')[0];
+    } else {
+        document.getElementById('announcement-publish-date').value = '';
+    }
+
+    if (item.expires_at) {
+        const eDate = new Date(item.expires_at);
+        document.getElementById('announcement-expire-date').value = eDate.toISOString().split('T')[0];
+    } else {
+        document.getElementById('announcement-expire-date').value = '';
+    }
+
+    modal.style.display = 'flex';
+}
+
+function deleteAnnouncement(id, title) {
+    if (!confirm(`Adakah anda pasti mahu memadamkan pekeliling "${title}"? Tindakan ini tidak boleh ditarik balik.`)) {
+        return;
+    }
+
+    fetch(getApiUrl(`api/announcements/delete?id=${id}`), {
+        method: 'DELETE'
+    })
+    .then(response => response.json())
+    .then(res => {
+        if (res.status === 'success') {
+            allAnnouncements = allAnnouncements.filter(a => a.id !== id);
+            renderAnnouncementsTable(allAnnouncements);
+        } else {
+            alert("Ralat: " + res.message);
+        }
+    })
+    .catch(err => {
+        alert("Ralat sambungan pelayan. Gagal memadam pekeliling.");
+    });
+}
+

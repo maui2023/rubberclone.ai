@@ -80,7 +80,7 @@ class User {
 
     // Senarai lengkap semua pengguna (untuk kegunaan Pentadbir RISDA)
     public function getAllUsers() {
-        $query = "SELECT u.id, u.email, u.username, u.fullname, u.agency, u.status, u.role, u.registration_date,
+        $query = "SELECT u.id, u.email, u.username, u.fullname, u.agency, u.status, u.role, u.avatar_url, u.registration_date,
                          (SELECT COUNT(*) FROM analysis_records WHERE user_id = u.id) as total_scans 
                   FROM " . $this->table . " u 
                   ORDER BY u.created_at DESC";
@@ -104,6 +104,45 @@ class User {
             return $stmt->execute();
         } catch (PDOException $e) {
             error_log("Error updating user status: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    // Mengemas kini maklumat pengguna oleh pentadbir
+    public function updateUser($id, $data) {
+        $fields = [
+            'fullname = :fullname',
+            'username = :username',
+            'email = :email',
+            'agency = :agency',
+            'role = :role',
+            'status = :status'
+        ];
+
+        if (!empty($data['password'])) {
+            $fields[] = 'password_hash = :password_hash';
+        }
+
+        $query = "UPDATE " . $this->table . " SET " . implode(', ', $fields) . " WHERE id = :id";
+
+        try {
+            $stmt = $this->db->prepare($query);
+            $stmt->bindParam(':id', $id);
+            $stmt->bindParam(':fullname', $data['fullname']);
+            $stmt->bindParam(':username', $data['username']);
+            $stmt->bindParam(':email', $data['email']);
+            $stmt->bindParam(':agency', $data['agency']);
+            $stmt->bindParam(':role', $data['role']);
+            $stmt->bindParam(':status', $data['status']);
+
+            if (!empty($data['password'])) {
+                $password_hash = password_hash($data['password'], PASSWORD_BCRYPT);
+                $stmt->bindParam(':password_hash', $password_hash);
+            }
+
+            return $stmt->execute();
+        } catch (PDOException $e) {
+            error_log("Error updating user: " . $e->getMessage());
             return false;
         }
     }

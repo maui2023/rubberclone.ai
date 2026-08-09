@@ -8,7 +8,7 @@ $this->view('layouts/header', $data);
     <div class="panel-header table-header">
         <div class="header-text-group">
             <h2 class="panel-title">Direktori Pengguna RISDA</h2>
-            <span class="panel-subtitle">Sahkan peranti, urus kelulusan, dan status akses pegawai lapangan</span>
+            <span class="panel-subtitle">Sahkan peranti, urus kelulusan, kemas kini profil, dan status akses pegawai lapangan</span>
         </div>
         <div class="table-actions-group" style="display: flex; align-items: center; gap: 1rem;">
             <!-- Input Carian -->
@@ -35,6 +35,7 @@ $this->view('layouts/header', $data);
         <table class="admin-table" id="users-data-table">
             <thead>
                 <tr>
+                    <th scope="col">Profil</th>
                     <th scope="col">Nama Penuh</th>
                     <th scope="col">Username</th>
                     <th scope="col">E-mel Pentadbir/Pegawai</th>
@@ -46,7 +47,7 @@ $this->view('layouts/header', $data);
             </thead>
             <tbody id="users-table-body">
                 <tr>
-                    <td colspan="7" class="table-loading-row">
+                    <td colspan="8" class="table-loading-row">
                         <span class="spinner"></span>
                         Memuatkan rekod pendaftaran pengguna...
                     </td>
@@ -57,9 +58,9 @@ $this->view('layouts/header', $data);
     
 </div>
 
-<!-- Modal Tambah Pengguna Baharu (Glassmorphism Modal Overlay) -->
+<!-- Modal Tambah / Sunting Pengguna (Glassmorphism Modal Overlay) -->
 <div class="modal-overlay" id="add-user-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); z-index: 1000; align-items: center; justify-content: center;">
-    <div class="modal-container glass-card" style="max-width: 500px; width: 90%; padding: 2.5rem; border-radius: var(--radius-lg); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 20px 50px rgba(0,0,0,0.4); position: relative; background: rgba(13, 27, 21, 0.92); backdrop-filter: blur(20px);">
+    <div class="modal-container glass-card" style="max-width: 520px; width: 90%; max-height: 90vh; overflow-y: auto; padding: 2.5rem; border-radius: var(--radius-lg); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 20px 50px rgba(0,0,0,0.4); position: relative; background: rgba(13, 27, 21, 0.92); backdrop-filter: blur(20px);">
         
         <!-- Butang Tutup -->
         <button class="modal-close-btn" id="btn-close-modal" aria-label="Tutup modal" style="position: absolute; top: 1.25rem; right: 1.25rem; background: none; border: none; color: var(--color-text-muted); cursor: pointer; transition: var(--transition-smooth);">
@@ -69,11 +70,20 @@ $this->view('layouts/header', $data);
             </svg>
         </button>
 
-        <h3 class="modal-title" style="margin-top: 0; margin-bottom: 0.5rem; font-family: var(--font-heading); color: var(--color-text-primary); font-size: 1.5rem; font-weight: 700;">Daftar Pengguna Baharu</h3>
-        <p class="modal-desc" style="margin-top: 0; margin-bottom: 2rem; color: var(--color-text-muted); font-size: 0.9rem;">Cipta akaun pegawai lapangan atau pentadbir RISDA secara selamat.</p>
+        <h3 class="modal-title" id="user-modal-title" style="margin-top: 0; margin-bottom: 0.5rem; font-family: var(--font-heading); color: var(--color-text-primary); font-size: 1.5rem; font-weight: 700;">Daftar Pengguna Baharu</h3>
+        <p class="modal-desc" id="user-modal-desc" style="margin-top: 0; margin-bottom: 1.5rem; color: var(--color-text-muted); font-size: 0.9rem;">Cipta akaun pegawai lapangan atau pentadbir RISDA secara selamat.</p>
 
-        <!-- Borang Tambah Pengguna -->
+        <!-- Paparan Gambar Profil jika Dimuat Naik -->
+        <div id="avatar-preview-container" style="display: none; align-items: center; justify-content: center; margin-bottom: 1.5rem;">
+            <div style="text-align: center;">
+                <img id="user-avatar-img" src="" alt="Gambar Profil" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 2px solid var(--color-emerald); box-shadow: 0 0 12px var(--color-emerald-glow);">
+                <div style="font-size: 0.75rem; color: var(--color-text-muted); margin-top: 0.35rem;">Gambar Profil Terkini</div>
+            </div>
+        </div>
+
+        <!-- Borang Pengguna -->
         <form id="add-user-form" style="display: flex; flex-direction: column; gap: 1.25rem;">
+            <input type="hidden" id="edit-user-id" value="">
             
             <div class="form-group" style="display: flex; flex-direction: column; gap: 0.5rem;">
                 <label for="reg-fullname" style="color: var(--color-text-secondary); font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">Nama Penuh</label>
@@ -91,8 +101,9 @@ $this->view('layouts/header', $data);
             </div>
 
             <div class="form-group" style="display: flex; flex-direction: column; gap: 0.5rem;">
-                <label for="reg-password" style="color: var(--color-text-secondary); font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">Kata Laluan Awalan</label>
-                <input type="password" id="reg-password" name="password" required placeholder="Minimum 8 aksara" style="width: 100%; padding: 0.8rem 1rem; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius-md); color: var(--color-text-primary); transition: var(--transition-smooth);">
+                <label for="reg-password" id="reg-password-label" style="color: var(--color-text-secondary); font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">Kata Laluan Awalan</label>
+                <input type="password" id="reg-password" name="password" placeholder="Minimum 8 aksara" style="width: 100%; padding: 0.8rem 1rem; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius-md); color: var(--color-text-primary); transition: var(--transition-smooth);">
+                <span id="reg-password-help" style="font-size: 0.75rem; color: var(--color-text-muted); display: none;">Biarkan kosong jika tidak mahu menukar kata laluan.</span>
             </div>
 
             <div class="form-group" style="display: flex; flex-direction: column; gap: 0.5rem;">

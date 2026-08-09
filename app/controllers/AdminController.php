@@ -149,6 +149,15 @@ class AdminController extends Controller {
         ]);
     }
 
+    // Paparan Halaman Pengurusan Pekeliling (GET /admin/announcements)
+    public function announcementsView() {
+        $this->checkWebAuth();
+        $this->view('admin/announcements', [
+            'title' => 'Pengurusan Pekeliling & Makluman - Rubber Clone AI',
+            'active_tab' => 'announcements'
+        ]);
+    }
+
     // --- API PENTADBIRAN (ADMIN API ENDPOINTS) ---
 
     // Dapatkan data senarai pengguna (GET /api/admin/users)
@@ -169,11 +178,66 @@ class AdminController extends Controller {
                 "agency" => $row['agency'],
                 "status" => $row['status'],
                 "role" => $row['role'],
+                "avatar_url" => $row['avatar_url'] ?? null,
                 "total_scans" => (int)$row['total_scans'],
                 "registration_date" => (int)$row['registration_date']
             ];
         }
         $this->jsonResponse(["status" => "success", "data" => $formatted]);
+    }
+
+    // Kemas kini maklumat pengguna oleh admin (POST /api/admin/update_user)
+    public function updateUser() {
+        $this->checkApiAuth();
+
+        $input = json_decode(file_get_contents('php://input'), true);
+        if (!$input) {
+            $input = $_POST;
+        }
+
+        $userId = $input['user_id'] ?? $input['id'] ?? null;
+        if (!$userId) {
+            $this->jsonResponse(["status" => "error", "message" => "ID pengguna wajib dibekalkan."], 400);
+        }
+
+        $fullname = trim(htmlspecialchars(strip_tags($input['fullname'] ?? ''), ENT_QUOTES, 'UTF-8'));
+        $username = trim(htmlspecialchars(strip_tags($input['username'] ?? ''), ENT_QUOTES, 'UTF-8'));
+        $email = trim($input['email'] ?? '');
+        $agency = trim(htmlspecialchars(strip_tags($input['agency'] ?? 'RISDA Pekebun Kecil'), ENT_QUOTES, 'UTF-8'));
+        $role = $input['role'] ?? 'user';
+        $status = $input['status'] ?? 'active';
+        $password = $input['password'] ?? null;
+
+        if (empty($fullname) || empty($username) || empty($email)) {
+            $this->jsonResponse(["status" => "error", "message" => "Nama, username, dan e-mel wajib diisi."], 400);
+        }
+
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $this->jsonResponse(["status" => "error", "message" => "Format e-mel tidak sah."], 400);
+        }
+
+        $userData = [
+            'fullname' => $fullname,
+            'username' => $username,
+            'email' => $email,
+            'agency' => $agency,
+            'role' => $role,
+            'status' => $status
+        ];
+
+        if (!empty($password)) {
+            if (strlen($password) < 8) {
+                $this->jsonResponse(["status" => "error", "message" => "Kata laluan mestilah sekurang-kurangnya 8 aksara."], 400);
+            }
+            $userData['password'] = $password;
+        }
+
+        $result = $this->userModel->updateUser($userId, $userData);
+        if ($result) {
+            $this->jsonResponse(["status" => "success", "message" => "Maklumat pengguna berjaya dikemas kini."]);
+        } else {
+            $this->jsonResponse(["status" => "error", "message" => "Gagal mengemas kini maklumat pengguna."], 500);
+        }
     }
 
     // Mengubah status akaun pengguna (POST /api/admin/toggle_user)

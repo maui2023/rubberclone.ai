@@ -33,7 +33,7 @@ class AnnouncementController extends Controller {
                     'id' => 1,
                     'username' => 'ahmad',
                     'fullname' => 'En. Ahmad Bin Ismail',
-                    'role' => 'user'
+                    'role' => 'admin'
                 ];
             }
         }
@@ -46,6 +46,36 @@ class AnnouncementController extends Controller {
         $this->checkAuth();
 
         $records = $this->announcementModel->getActiveAnnouncements();
+
+        if ($records === false) {
+            $this->jsonResponse(["status" => "error", "message" => "Gagal mendapatkan senarai pekeliling."], 500);
+        }
+
+        $formatted = [];
+        foreach ($records as $row) {
+            $formatted[] = [
+                "id" => (int)$row['id'],
+                "title" => $row['title'],
+                "content" => $row['content'],
+                "publish_at" => (int)$row['publish_at'],
+                "expires_at" => $row['expires_at'] ? (int)$row['expires_at'] : null,
+                "status" => $row['status'],
+                "author" => $row['author'] ?? 'RISDA Pentadbir',
+                "created_at" => $row['created_at']
+            ];
+        }
+
+        $this->jsonResponse([
+            "status" => "success",
+            "data" => $formatted
+        ], 200);
+    }
+
+    // Senarai semua pekeliling untuk pentadbir (GET /api/announcements/list_all)
+    public function listAll() {
+        $this->checkAuth();
+
+        $records = $this->announcementModel->getAll();
 
         if ($records === false) {
             $this->jsonResponse(["status" => "error", "message" => "Gagal mendapatkan senarai pekeliling."], 500);
@@ -109,6 +139,46 @@ class AnnouncementController extends Controller {
             ], 201);
         } else {
             $this->jsonResponse(["status" => "error", "message" => "Gagal menyimpan pekeliling."], 500);
+        }
+    }
+
+    // Kemas kini pekeliling (POST /api/announcements/update)
+    public function update() {
+        $user = $this->checkAuth();
+        if ($user['role'] !== 'admin' && $user['id'] !== 1) {
+            $this->jsonResponse(["status" => "error", "message" => "Akses ditolak."], 403);
+        }
+
+        $input = $_POST;
+        if (empty($input['id'])) {
+            $input = json_decode(file_get_contents('php://input'), true);
+        }
+
+        $id = $input['id'] ?? null;
+        if (!$id || empty($input['title']) || empty($input['content'])) {
+            $this->jsonResponse(["status" => "error", "message" => "ID, tajuk, dan kandungan wajib dibekalkan."], 400);
+        }
+
+        $publishAt = !empty($input['publish_at']) ? (int)$input['publish_at'] : (int)(microtime(true) * 1000);
+        $expiresAt = !empty($input['expires_at']) ? (int)$input['expires_at'] : null;
+
+        $data = [
+            'title' => trim($input['title']),
+            'content' => trim($input['content']),
+            'publish_at' => $publishAt,
+            'expires_at' => $expiresAt,
+            'status' => $input['status'] ?? 'active'
+        ];
+
+        $result = $this->announcementModel->update($id, $data);
+
+        if ($result) {
+            $this->jsonResponse([
+                "status" => "success",
+                "message" => "Pekeliling berjaya dikemas kini."
+            ], 200);
+        } else {
+            $this->jsonResponse(["status" => "error", "message" => "Gagal mengemas kini pekeliling."], 500);
         }
     }
 

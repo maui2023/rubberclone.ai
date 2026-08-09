@@ -3,63 +3,91 @@
 
 class Announcement {
     private $db;
+    private $table = 'announcements';
 
     public function __construct() {
-        $this->db = new Database();
+        $database = new Database();
+        $this->db = $database->getConnection();
     }
 
     // Mengambil semua pekeliling aktif yang sudah tiba tarikh siaran (publish_at <= sekarang) dan belum luput (expires_at > sekarang)
     public function getActiveAnnouncements() {
         $nowMs = (int)(microtime(true) * 1000);
         
-        $sql = "SELECT * FROM announcements 
+        $sql = "SELECT * FROM " . $this->table . " 
                 WHERE status = 'active' 
                   AND publish_at <= :now_publish 
                   AND (expires_at IS NULL OR expires_at > :now_expires) 
                 ORDER BY publish_at DESC";
         
-        $this->db->query($sql);
-        $this->db->bind(':now_publish', $nowMs);
-        $this->db->bind(':now_expires', $nowMs);
-        
-        return $this->db->resultSet();
+        try {
+            $stmt = $this->db->prepare($sql);
+            $stmt->bindParam(':now_publish', $nowMs);
+            $stmt->bindParam(':now_expires', $nowMs);
+            $stmt->execute();
+            return $stmt->fetchAll();
+        } catch (PDOException $e) {
+            error_log("Error fetching active announcements: " . $e->getMessage());
+            return false;
+        }
     }
 
     // Mengambil semua pekeliling (untuk Pentadbir)
     public function getAll() {
-        $this->db->query("SELECT * FROM announcements ORDER BY publish_at DESC");
-        return $this->db->resultSet();
+        $sql = "SELECT * FROM " . $this->table . " ORDER BY publish_at DESC";
+        try {
+            $stmt = $this->db->query($sql);
+            return $stmt->fetchAll();
+        } catch (PDOException $e) {
+            error_log("Error fetching all announcements: " . $e->getMessage());
+            return false;
+        }
     }
 
     // Mengambil pekeliling mengikut ID
     public function getById($id) {
-        $this->db->query("SELECT * FROM announcements WHERE id = :id");
-        $this->db->bind(':id', $id);
-        return $this->db->single();
+        $sql = "SELECT * FROM " . $this->table . " WHERE id = :id LIMIT 1";
+        try {
+            $stmt = $this->db->prepare($sql);
+            $stmt->bindParam(':id', $id);
+            $stmt->execute();
+            return $stmt->fetch();
+        } catch (PDOException $e) {
+            error_log("Error fetching announcement by ID: " . $e->getMessage());
+            return false;
+        }
     }
 
     // Tambah pekeliling baharu
     public function create($data) {
-        $sql = "INSERT INTO announcements (title, content, publish_at, expires_at, status, author) 
+        $sql = "INSERT INTO " . $this->table . " (title, content, publish_at, expires_at, status, author) 
                 VALUES (:title, :content, :publish_at, :expires_at, :status, :author)";
         
-        $this->db->query($sql);
-        $this->db->bind(':title', $data['title']);
-        $this->db->bind(':content', $data['content']);
-        $this->db->bind(':publish_at', $data['publish_at']);
-        $this->db->bind(':expires_at', $data['expires_at']);
-        $this->db->bind(':status', $data['status'] ?? 'active');
-        $this->db->bind(':author', $data['author'] ?? 'RISDA Pentadbir');
+        try {
+            $stmt = $this->db->prepare($sql);
+            $status = $data['status'] ?? 'active';
+            $author = $data['author'] ?? 'RISDA Pentadbir';
 
-        if ($this->db->execute()) {
-            return $this->db->lastInsertId();
+            $stmt->bindParam(':title', $data['title']);
+            $stmt->bindParam(':content', $data['content']);
+            $stmt->bindParam(':publish_at', $data['publish_at']);
+            $stmt->bindParam(':expires_at', $data['expires_at']);
+            $stmt->bindParam(':status', $status);
+            $stmt->bindParam(':author', $author);
+
+            if ($stmt->execute()) {
+                return $this->db->lastInsertId();
+            }
+            return false;
+        } catch (PDOException $e) {
+            error_log("Error creating announcement: " . $e->getMessage());
+            return false;
         }
-        return false;
     }
 
     // Kemas kini pekeliling
     public function update($id, $data) {
-        $sql = "UPDATE announcements 
+        $sql = "UPDATE " . $this->table . " 
                 SET title = :title, 
                     content = :content, 
                     publish_at = :publish_at, 
@@ -67,21 +95,32 @@ class Announcement {
                     status = :status 
                 WHERE id = :id";
         
-        $this->db->query($sql);
-        $this->db->bind(':id', $id);
-        $this->db->bind(':title', $data['title']);
-        $this->db->bind(':content', $data['content']);
-        $this->db->bind(':publish_at', $data['publish_at']);
-        $this->db->bind(':expires_at', $data['expires_at']);
-        $this->db->bind(':status', $data['status']);
+        try {
+            $stmt = $this->db->prepare($sql);
+            $stmt->bindParam(':id', $id);
+            $stmt->bindParam(':title', $data['title']);
+            $stmt->bindParam(':content', $data['content']);
+            $stmt->bindParam(':publish_at', $data['publish_at']);
+            $stmt->bindParam(':expires_at', $data['expires_at']);
+            $stmt->bindParam(':status', $data['status']);
 
-        return $this->db->execute();
+            return $stmt->execute();
+        } catch (PDOException $e) {
+            error_log("Error updating announcement: " . $e->getMessage());
+            return false;
+        }
     }
 
     // Padam pekeliling
     public function delete($id) {
-        $this->db->query("DELETE FROM announcements WHERE id = :id");
-        $this->db->bind(':id', $id);
-        return $this->db->execute();
+        $sql = "DELETE FROM " . $this->table . " WHERE id = :id";
+        try {
+            $stmt = $this->db->prepare($sql);
+            $stmt->bindParam(':id', $id);
+            return $stmt->execute();
+        } catch (PDOException $e) {
+            error_log("Error deleting announcement: " . $e->getMessage());
+            return false;
+        }
     }
 }

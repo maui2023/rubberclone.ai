@@ -33,20 +33,29 @@ class App {
             'api/clone-samples/update' => ['CloneSampleController', 'update', 'POST'],
             'api/clone-samples/delete' => ['CloneSampleController', 'delete', 'DELETE'],
             
+            // 2.6. Laluan API Pekeliling & Makluman (Announcement Endpoints)
+            'api/announcements/list'     => ['AnnouncementController', 'list', 'GET'],
+            'api/announcements/list_all' => ['AnnouncementController', 'listAll', 'GET'],
+            'api/announcements/create'   => ['AnnouncementController', 'create', 'POST'],
+            'api/announcements/update'   => ['AnnouncementController', 'update', 'POST'],
+            'api/announcements/delete'   => ['AnnouncementController', 'delete', 'DELETE'],
+
             // 3. Laluan API Pentadbir (Admin Endpoints)
             'api/admin/users'       => ['AdminController', 'getUsers', 'GET'],
             'api/admin/toggle_user' => ['AdminController', 'toggleUserStatus', 'POST'],
+            'api/admin/create_user' => ['AdminController', 'createUser', 'POST'],
+            'api/admin/update_user' => ['AdminController', 'updateUser', 'POST'],
             'api/admin/stats'       => ['AdminController', 'getStats', 'GET'],
             'api/admin/update_cms'  => ['AdminController', 'updateCms', 'POST'],
             'api/admin/blog/create' => ['AdminController', 'createBlogPost', 'POST'],
             'api/admin/blog/delete' => ['AdminController', 'deleteBlogPost', 'DELETE'],
-            'api/admin/create_user' => ['AdminController', 'createUser', 'POST'],
             
             // 4. Halaman Web Portal Pentadbir (Admin Web Views)
             'pentadbir'             => ['AdminController', 'dashboard', 'GET'],
             'admin/users'           => ['AdminController', 'usersView', 'GET'],
             'admin/history'         => ['AdminController', 'historyView', 'GET'],
             'admin/clone-samples'   => ['AdminController', 'cloneSamplesView', 'GET'],
+            'admin/announcements'   => ['AdminController', 'announcementsView', 'GET'],
             'admin/cms'             => ['AdminController', 'cmsView', 'GET'],
             'admin/loginWeb'        => ['AdminController', 'loginWeb', 'POST'],
             'admin/logoutWeb'       => ['AdminController', 'logoutWeb', 'GET']

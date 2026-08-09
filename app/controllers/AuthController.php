@@ -18,7 +18,10 @@ class AuthController extends Controller {
 
     // Log Masuk Pengguna & Jana Token (POST /api/auth/login)
     public function login() {
-        $input = json_decode(file_get_contents('php://input'), true);
+        $input = $_POST;
+        if (empty($input['email'])) {
+            $input = json_decode(file_get_contents('php://input'), true);
+        }
 
         if (!$input || empty($input['email']) || empty($input['password'])) {
             $this->jsonResponse(["status" => "error", "message" => "E-mel dan kata laluan diperlukan."], 400);

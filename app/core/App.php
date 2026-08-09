@@ -20,6 +20,7 @@ class App {
             // 1. Laluan API Pengesahan (Auth Endpoints)
             'api/auth/register'     => ['AuthController', 'register', 'POST'],
             'api/auth/login'        => ['AuthController', 'login', 'POST'],
+            'api/auth/upload-avatar' => ['AuthController', 'uploadAvatar', 'POST'],
             
             // 2. Laluan API Analisis Daun (Analysis Endpoints)
             'api/analysis/upload'   => ['AnalysisController', 'upload', 'POST'],

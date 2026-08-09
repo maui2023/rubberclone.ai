@@ -169,12 +169,108 @@ function initDashboard() {
         });
 }
 
+// // --- UPAH & STATE PAGINATION PENTADBIR ---
+const paginationState = {
+    users: { page: 1, limit: 10 },
+    history: { page: 1, limit: 10 },
+    clones: { page: 1, limit: 10 },
+    announcements: { page: 1, limit: 10 }
+};
+
+function updateTablePagination(prefix, totalItems) {
+    const state = paginationState[prefix];
+    const totalPages = Math.max(1, Math.ceil(totalItems / state.limit));
+    
+    if (state.page > totalPages) state.page = totalPages;
+    if (state.page < 1) state.page = 1;
+
+    const startItem = totalItems === 0 ? 0 : (state.page - 1) * state.limit + 1;
+    const endItem = Math.min(totalItems, state.page * state.limit);
+
+    const infoEl = document.getElementById(`${prefix}-pagination-info`);
+    if (infoEl) {
+        infoEl.innerText = `Menunjukkan ${startItem} - ${endItem} daripada ${totalItems} rekod`;
+    }
+
+    const indicatorEl = document.getElementById(`${prefix}-page-indicator`);
+    if (indicatorEl) {
+        indicatorEl.innerText = `Halaman ${state.page} / ${totalPages}`;
+    }
+
+    const prevBtn = document.getElementById(`${prefix}-prev-page`);
+    const nextBtn = document.getElementById(`${prefix}-next-page`);
+
+    if (prevBtn) prevBtn.disabled = state.page <= 1;
+    if (nextBtn) nextBtn.disabled = state.page >= totalPages;
+
+    const startIndex = (state.page - 1) * state.limit;
+    return {
+        startIndex: startIndex,
+        endIndex: startIndex + state.limit
+    };
+}
+
+function bindPaginationEvents(prefix, renderCallback) {
+    const pageSizeSelect = document.getElementById(`${prefix}-page-size`);
+    const prevBtn = document.getElementById(`${prefix}-prev-page`);
+    const nextBtn = document.getElementById(`${prefix}-next-page`);
+
+    if (pageSizeSelect) {
+        pageSizeSelect.addEventListener('change', function () {
+            paginationState[prefix].limit = parseInt(this.value);
+            paginationState[prefix].page = 1;
+            renderCallback();
+        });
+    }
+
+    if (prevBtn) {
+        prevBtn.addEventListener('click', function () {
+            if (paginationState[prefix].page > 1) {
+                paginationState[prefix].page--;
+                renderCallback();
+            }
+        });
+    }
+
+    if (nextBtn) {
+        nextBtn.addEventListener('click', function () {
+            paginationState[prefix].page++;
+            renderCallback();
+        });
+    }
+}
+
 // --- 2. LOGIK DIREKTORI PENGGUNA ---
 let allUsers = [];
+
+function applyUsersFiltersAndRender() {
+    const query = (document.getElementById('search-users-input')?.value || '').toLowerCase();
+    const statusVal = document.getElementById('filter-user-status')?.value || '';
+    const roleVal = document.getElementById('filter-user-role')?.value || '';
+
+    const filtered = allUsers.filter(user => {
+        const matchesSearch = 
+            user.fullname.toLowerCase().includes(query) ||
+            user.username.toLowerCase().includes(query) ||
+            user.email.toLowerCase().includes(query) ||
+            user.agency.toLowerCase().includes(query);
+
+        const matchesStatus = statusVal === '' || user.status === statusVal;
+        const matchesRole = roleVal === '' || user.role === roleVal;
+
+        return matchesSearch && matchesStatus && matchesRole;
+    });
+
+    const sliceInfo = updateTablePagination('users', filtered.length);
+    const pageSlice = filtered.slice(sliceInfo.startIndex, sliceInfo.endIndex);
+    renderUsersTable(pageSlice);
+}
 
 function initUsersDirectory() {
     const tableBody = document.getElementById('users-table-body');
     const searchInput = document.getElementById('search-users-input');
+    const statusFilter = document.getElementById('filter-user-status');
+    const roleFilter = document.getElementById('filter-user-role');
     const modal = document.getElementById('add-user-modal');
     const btnAddUser = document.getElementById('btn-add-user');
     const btnCloseModal = document.getElementById('btn-close-modal');
@@ -196,31 +292,28 @@ function initUsersDirectory() {
             .then(res => {
                 if (res.status === 'success') {
                     allUsers = res.data;
-                    renderUsersTable(allUsers);
+                    paginationState.users.page = 1;
+                    applyUsersFiltersAndRender();
                 } else {
                     allUsers = [];
                     tableBody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:#ef4444;">${res.message}</td></tr>`;
+                    updateTablePagination('users', 0);
                 }
             })
             .catch(err => {
                 allUsers = [];
                 tableBody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:#ef4444;">Ralat sambungan pelayan. Anda masih boleh menambah pengguna secara demonstrasi dalam UI.</td></tr>`;
+                updateTablePagination('users', 0);
             });
     }
 
     fetchAndRenderUsers();
 
-    // Carian pengguna masa nyata
-    searchInput.addEventListener('input', function () {
-        const query = searchInput.value.toLowerCase();
-        const filtered = allUsers.filter(user => 
-            user.fullname.toLowerCase().includes(query) ||
-            user.username.toLowerCase().includes(query) ||
-            user.email.toLowerCase().includes(query) ||
-            user.agency.toLowerCase().includes(query)
-        );
-        renderUsersTable(filtered);
-    });
+    if (searchInput) searchInput.addEventListener('input', () => { paginationState.users.page = 1; applyUsersFiltersAndRender(); });
+    if (statusFilter) statusFilter.addEventListener('change', () => { paginationState.users.page = 1; applyUsersFiltersAndRender(); });
+    if (roleFilter) roleFilter.addEventListener('change', () => { paginationState.users.page = 1; applyUsersFiltersAndRender(); });
+
+    bindPaginationEvents('users', applyUsersFiltersAndRender);
 
     // Urus Modal Tunjuk/Sembunyi (Tambah Pengguna)
     if (btnAddUser && modal) {
@@ -430,6 +523,8 @@ function toggleUserAccess(userId, checkbox) {
                 badge.className = 'status-badge inactive';
                 badge.innerText = 'Nyahaktif';
             }
+            const u = allUsers.find(item => item.id === userId);
+            if (u) u.status = newStatus;
         } else {
             // Jika gagal, kembalikan posisi suis togol
             checkbox.checked = !checkbox.checked;
@@ -445,56 +540,77 @@ function toggleUserAccess(userId, checkbox) {
 // --- 3. LOGIK AUDIT SEJARAH IMBASAN ---
 let allRecords = [];
 
+function applyHistoryFiltersAndRender() {
+    const query = (document.getElementById('search-history-input')?.value || '').toLowerCase();
+    const selectedClone = document.getElementById('filter-clone-select')?.value || '';
+    const selectedConfidence = document.getElementById('filter-confidence-select')?.value || '';
+
+    const filtered = allRecords.filter(rec => {
+        const matchesSearch = 
+            (rec.fullname || '').toLowerCase().includes(query) ||
+            (rec.username || '').toLowerCase().includes(query) ||
+            (rec.location_name || '').toLowerCase().includes(query) ||
+            (rec.clone_name || '').toLowerCase().includes(query);
+
+        const matchesClone = selectedClone === "" || rec.clone_name === selectedClone;
+
+        let matchesConfidence = true;
+        if (selectedConfidence === 'high') {
+            matchesConfidence = rec.confidence >= 0.90;
+        } else if (selectedConfidence === 'medium') {
+            matchesConfidence = rec.confidence >= 0.75 && rec.confidence < 0.90;
+        } else if (selectedConfidence === 'low') {
+            matchesConfidence = rec.confidence < 0.75;
+        }
+
+        return matchesSearch && matchesClone && matchesConfidence;
+    });
+
+    const sliceInfo = updateTablePagination('history', filtered.length);
+    const pageSlice = filtered.slice(sliceInfo.startIndex, sliceInfo.endIndex);
+    renderHistoryTable(pageSlice);
+}
+
 function initHistoryAudit() {
     const tableBody = document.getElementById('history-table-body');
     const searchInput = document.getElementById('search-history-input');
     const filterSelect = document.getElementById('filter-clone-select');
+    const confidenceSelect = document.getElementById('filter-confidence-select');
     const modal = document.getElementById('info-modal');
     const closeModalBtn = document.getElementById('close-modal-btn');
 
     // Mengambil data senarai imbasan daun
-    fetch(getApiUrl('api/analysis/list'))
+    fetch(getApiUrl('api/analysis/list?all=true'))
         .then(response => response.json())
         .then(res => {
             if (res.status === 'success') {
                 allRecords = res.data;
-                renderHistoryTable(allRecords);
+                paginationState.history.page = 1;
+                applyHistoryFiltersAndRender();
             } else {
                 tableBody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:#ef4444;">${res.message}</td></tr>`;
+                updateTablePagination('history', 0);
             }
         })
         .catch(err => {
             tableBody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:#ef4444;">Ralat sambungan pelayan.</td></tr>`;
+            updateTablePagination('history', 0);
         });
 
     // Carian sejarah imbasan
-    searchInput.addEventListener('input', applyFilters);
-    filterSelect.addEventListener('change', applyFilters);
+    if (searchInput) searchInput.addEventListener('input', () => { paginationState.history.page = 1; applyHistoryFiltersAndRender(); });
+    if (filterSelect) filterSelect.addEventListener('change', () => { paginationState.history.page = 1; applyHistoryFiltersAndRender(); });
+    if (confidenceSelect) confidenceSelect.addEventListener('change', () => { paginationState.history.page = 1; applyHistoryFiltersAndRender(); });
+
+    bindPaginationEvents('history', applyHistoryFiltersAndRender);
 
     // Tutup modal
-    closeModalBtn.addEventListener('click', () => modal.style.display = 'none');
-    window.addEventListener('click', (e) => {
-        if (e.target === modal) modal.style.display = 'none';
-    });
-}
-
-function applyFilters() {
-    const query = document.getElementById('search-history-input').value.toLowerCase();
-    const selectedClone = document.getElementById('filter-clone-select').value;
-
-    const filtered = allRecords.filter(rec => {
-        const matchesSearch = 
-            rec.fullname.toLowerCase().includes(query) ||
-            rec.username.toLowerCase().includes(query) ||
-            rec.location_name.toLowerCase().includes(query) ||
-            rec.clone_name.toLowerCase().includes(query);
-            
-        const matchesClone = selectedClone === "" || rec.clone_name === selectedClone;
-
-        return matchesSearch && matchesClone;
-    });
-
-    renderHistoryTable(filtered);
+    if (closeModalBtn && modal) {
+        closeModalBtn.addEventListener('click', () => modal.style.display = 'none');
+        window.addEventListener('click', (e) => {
+            if (e.target === modal) modal.style.display = 'none';
+        });
+    }
 }
 
 function renderHistoryTable(recordsList) {
@@ -518,8 +634,8 @@ function renderHistoryTable(recordsList) {
         const tr = document.createElement('tr');
         tr.innerHTML = `
             <td>${imgCell}</td>
-            <td style="font-weight:600; color:var(--color-mint-light);">${rec.fullname || rec.username}</td>
-            <td style="color:var(--color-gold-latex); font-weight:600;">${rec.clone_name}</td>
+            <td style="font-weight:600; color:var(--color-mint-light);">${escapeHtml(rec.fullname || rec.username)}</td>
+            <td style="color:var(--color-gold-latex); font-weight:600;">${escapeHtml(rec.clone_name)}</td>
             <td>
                 <div style="display:flex; align-items:center; gap:0.4rem;">
                     <div style="background:rgba(255,255,255,0.05); width:60px; height:6px; border-radius:10px; overflow:hidden;">
@@ -530,11 +646,11 @@ function renderHistoryTable(recordsList) {
             </td>
             <td style="font-size:0.8rem;">${dateStr}</td>
             <td style="font-size:0.8rem;">
-                <strong>${rec.location_name}</strong><br>
+                <strong>${escapeHtml(rec.location_name)}</strong><br>
                 <span style="color:var(--color-text-muted);">${rec.latitude.toFixed(4)}, ${rec.longitude.toFixed(4)}</span>
             </td>
-            <td style="font-size:0.8rem; max-width:220px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${rec.notes}">
-                ${rec.notes || '<span style="color:var(--color-text-muted);">Tiada catatan</span>'}
+            <td style="font-size:0.8rem; max-width:220px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${escapeHtml(rec.notes || '')}">
+                ${escapeHtml(rec.notes) || '<span style="color:var(--color-text-muted);">Tiada catatan</span>'}
             </td>
             <td>
                 <div style="display:flex; gap:0.5rem;">
@@ -569,16 +685,16 @@ function openDetailsModal(recordId) {
     detailsContainer.innerHTML = `
         <div class="modal-field">
             <span class="modal-field-label">Pegawai Lapangan</span>
-            <span class="modal-field-val" style="font-weight:600;">${rec.fullname} (@${rec.username})</span>
+            <span class="modal-field-val" style="font-weight:600;">${escapeHtml(rec.fullname)} (@${escapeHtml(rec.username)})</span>
         </div>
         <div class="modal-field">
             <span class="modal-field-label">Agensi RISDA</span>
-            <span class="modal-field-val">${rec.agency}</span>
+            <span class="modal-field-val">${escapeHtml(rec.agency)}</span>
         </div>
         <div class="modal-field">
             <span class="modal-field-label">Keputusan Analisis Klon</span>
             <span class="modal-field-val" style="color:var(--color-gold-latex); font-weight:700; font-size:1.1rem;">
-                ${rec.clone_name} <span style="color:var(--color-emerald); font-size:0.9rem;">(${(rec.confidence * 100).toFixed(0)}% keyakinan)</span>
+                ${escapeHtml(rec.clone_name)} <span style="color:var(--color-emerald); font-size:0.9rem;">(${(rec.confidence * 100).toFixed(0)}% keyakinan)</span>
             </span>
         </div>
         <div class="modal-field">
@@ -587,15 +703,15 @@ function openDetailsModal(recordId) {
         </div>
         <div class="modal-field">
             <span class="modal-field-label">Lokasi Stesen Tapak</span>
-            <span class="modal-field-val">${rec.location_name} (${rec.latitude.toFixed(5)}, ${rec.longitude.toFixed(5)})</span>
+            <span class="modal-field-val">${escapeHtml(rec.location_name)} (${rec.latitude.toFixed(5)}, ${rec.longitude.toFixed(5)})</span>
         </div>
         <div class="modal-field">
             <span class="modal-field-label">Maklumat Tanah & Elevasi</span>
-            <span class="modal-field-val">Tanah: ${rec.soil_type} | Taburan Hujan: ${rec.rainfall} | Elevasi: ${rec.elevation}</span>
+            <span class="modal-field-val">Tanah: ${escapeHtml(rec.soil_type)} | Taburan Hujan: ${escapeHtml(rec.rainfall)} | Elevasi: ${escapeHtml(rec.elevation)}</span>
         </div>
         <div class="modal-field">
             <span class="modal-field-label">Catatan AI Gemini</span>
-            <span class="modal-field-val" style="font-style:italic; background:rgba(255,255,255,0.02); padding:0.75rem; border-radius:var(--radius-sm); border:1px solid rgba(255,255,255,0.04);">${rec.notes || 'Tiada catatan tambahan.'}</span>
+            <span class="modal-field-val" style="font-style:italic; background:rgba(255,255,255,0.02); padding:0.75rem; border-radius:var(--radius-sm); border:1px solid rgba(255,255,255,0.04);">${escapeHtml(rec.notes) || 'Tiada catatan tambahan.'}</span>
         </div>
     `;
 
@@ -614,9 +730,8 @@ function deleteHistoryRecord(recordId) {
     .then(response => response.json())
     .then(res => {
         if (res.status === 'success') {
-            // Buang dari senarai lokal dan render semula table
             allRecords = allRecords.filter(item => item.id !== recordId);
-            renderHistoryTable(allRecords);
+            applyHistoryFiltersAndRender();
         } else {
             alert("Ralat: " + res.message);
         }
@@ -771,6 +886,7 @@ function deleteBlogStory(blogId) {
 
 // Fungsi pembantu untuk escape HTML bagi mengelakkan XSS
 function escapeHtml(text) {
+    if (!text) return '';
     const map = {
         '&': '&amp;',
         '<': '&lt;',
@@ -778,15 +894,40 @@ function escapeHtml(text) {
         '"': '&quot;',
         "'": '&#039;'
     };
-    return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+    return String(text).replace(/[&<>"']/g, function(m) { return map[m]; });
 }
 
 // --- 5. LOGIK PENGURUSAN SAMPEL KLON ---
 let allClones = [];
 
+function applyClonesFiltersAndRender() {
+    const query = (document.getElementById('search-clones-input')?.value || '').toLowerCase();
+    const latexVal = document.getElementById('filter-latex-select')?.value || '';
+    const statusVal = document.getElementById('filter-clone-status-select')?.value || '';
+
+    const filtered = allClones.filter(clone => {
+        const matchesSearch = 
+            clone.clone_name.toLowerCase().includes(query) ||
+            (clone.warisan && clone.warisan.toLowerCase().includes(query)) ||
+            (clone.bentuk_daun && clone.bentuk_daun.toLowerCase().includes(query)) ||
+            (clone.warna_lateks && clone.warna_lateks.toLowerCase().includes(query));
+
+        const matchesLatex = latexVal === '' || (clone.warna_lateks && clone.warna_lateks.toLowerCase().includes(latexVal.toLowerCase()));
+        const matchesStatus = statusVal === '' || clone.status === statusVal;
+
+        return matchesSearch && matchesLatex && matchesStatus;
+    });
+
+    const sliceInfo = updateTablePagination('clones', filtered.length);
+    const pageSlice = filtered.slice(sliceInfo.startIndex, sliceInfo.endIndex);
+    renderClonesTable(pageSlice);
+}
+
 function initCloneSamples() {
     const tableBody = document.getElementById('clones-table-body');
     const searchInput = document.getElementById('search-clones-input');
+    const latexFilter = document.getElementById('filter-latex-select');
+    const statusFilter = document.getElementById('filter-clone-status-select');
     const modal = document.getElementById('clone-modal');
     const detailModal = document.getElementById('clone-detail-modal');
     const btnAddClone = document.getElementById('btn-add-clone');
@@ -806,31 +947,28 @@ function initCloneSamples() {
             .then(res => {
                 if (res.status === 'success') {
                     allClones = res.data;
-                    renderClonesTable(allClones);
+                    paginationState.clones.page = 1;
+                    applyClonesFiltersAndRender();
                 } else {
                     allClones = [];
                     tableBody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:#ef4444;">${res.message}</td></tr>`;
+                    updateTablePagination('clones', 0);
                 }
             })
             .catch(err => {
                 allClones = [];
                 tableBody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:#ef4444;">Ralat sambungan pelayan. Sila semak konfigurasi pangkalan data.</td></tr>`;
+                updateTablePagination('clones', 0);
             });
     }
 
     fetchAndRenderClones();
 
-    // Carian klon masa nyata
-    searchInput.addEventListener('input', function () {
-        const query = searchInput.value.toLowerCase();
-        const filtered = allClones.filter(clone =>
-            clone.clone_name.toLowerCase().includes(query) ||
-            (clone.warisan && clone.warisan.toLowerCase().includes(query)) ||
-            (clone.bentuk_daun && clone.bentuk_daun.toLowerCase().includes(query)) ||
-            (clone.warna_lateks && clone.warna_lateks.toLowerCase().includes(query))
-        );
-        renderClonesTable(filtered);
-    });
+    if (searchInput) searchInput.addEventListener('input', () => { paginationState.clones.page = 1; applyClonesFiltersAndRender(); });
+    if (latexFilter) latexFilter.addEventListener('change', () => { paginationState.clones.page = 1; applyClonesFiltersAndRender(); });
+    if (statusFilter) statusFilter.addEventListener('change', () => { paginationState.clones.page = 1; applyClonesFiltersAndRender(); });
+
+    bindPaginationEvents('clones', applyClonesFiltersAndRender);
 
     // Urus Modal Tunjuk/Sembunyi — Tambah Klon
     if (btnAddClone && modal) {
@@ -1065,7 +1203,7 @@ function deleteClone(cloneId, cloneName) {
     .then(res => {
         if (res.status === 'success') {
             allClones = allClones.filter(c => c.id !== cloneId);
-            renderClonesTable(allClones);
+            applyClonesFiltersAndRender();
         } else {
             alert("Ralat: " + res.message);
         }
@@ -1078,9 +1216,30 @@ function deleteClone(cloneId, cloneName) {
 // --- 6. LOGIK PENGURUSAN PEKELILING & MAKLUMAN ---
 let allAnnouncements = [];
 
+function applyAnnouncementsFiltersAndRender() {
+    const query = (document.getElementById('search-announcements-input')?.value || '').toLowerCase();
+    const statusVal = document.getElementById('filter-announcement-status')?.value || '';
+
+    const filtered = allAnnouncements.filter(item => {
+        const matchesSearch = 
+            item.title.toLowerCase().includes(query) ||
+            (item.content && item.content.toLowerCase().includes(query)) ||
+            (item.author && item.author.toLowerCase().includes(query));
+
+        const matchesStatus = statusVal === '' || item.status === statusVal;
+
+        return matchesSearch && matchesStatus;
+    });
+
+    const sliceInfo = updateTablePagination('announcements', filtered.length);
+    const pageSlice = filtered.slice(sliceInfo.startIndex, sliceInfo.endIndex);
+    renderAnnouncementsTable(pageSlice);
+}
+
 function initAnnouncements() {
     const tableBody = document.getElementById('announcements-table-body');
     const searchInput = document.getElementById('search-announcements-input');
+    const statusFilter = document.getElementById('filter-announcement-status');
     const modal = document.getElementById('announcement-modal');
     const detailModal = document.getElementById('announcement-detail-modal');
     const btnAddAnnouncement = document.getElementById('btn-add-announcement');
@@ -1099,32 +1258,27 @@ function initAnnouncements() {
             .then(res => {
                 if (res.status === 'success') {
                     allAnnouncements = res.data;
-                    renderAnnouncementsTable(allAnnouncements);
+                    paginationState.announcements.page = 1;
+                    applyAnnouncementsFiltersAndRender();
                 } else {
                     allAnnouncements = [];
                     tableBody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#ef4444;">${res.message}</td></tr>`;
+                    updateTablePagination('announcements', 0);
                 }
             })
             .catch(err => {
                 allAnnouncements = [];
                 tableBody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#ef4444;">Ralat sambungan pelayan. Sila semak sambungan pangkalan data.</td></tr>`;
+                updateTablePagination('announcements', 0);
             });
     }
 
     fetchAndRenderAnnouncements();
 
-    // Carian pekeliling masa nyata
-    if (searchInput) {
-        searchInput.addEventListener('input', function () {
-            const query = searchInput.value.toLowerCase();
-            const filtered = allAnnouncements.filter(item =>
-                item.title.toLowerCase().includes(query) ||
-                (item.content && item.content.toLowerCase().includes(query)) ||
-                (item.author && item.author.toLowerCase().includes(query))
-            );
-            renderAnnouncementsTable(filtered);
-        });
-    }
+    if (searchInput) searchInput.addEventListener('input', () => { paginationState.announcements.page = 1; applyAnnouncementsFiltersAndRender(); });
+    if (statusFilter) statusFilter.addEventListener('change', () => { paginationState.announcements.page = 1; applyAnnouncementsFiltersAndRender(); });
+
+    bindPaginationEvents('announcements', applyAnnouncementsFiltersAndRender);
 
     // Modal Tambah Pekeliling
     if (btnAddAnnouncement && modal) {
@@ -1348,7 +1502,7 @@ function deleteAnnouncement(id, title) {
     .then(res => {
         if (res.status === 'success') {
             allAnnouncements = allAnnouncements.filter(a => a.id !== id);
-            renderAnnouncementsTable(allAnnouncements);
+            applyAnnouncementsFiltersAndRender();
         } else {
             alert("Ralat: " + res.message);
         }
@@ -1357,4 +1511,3 @@ function deleteAnnouncement(id, title) {
         alert("Ralat sambungan pelayan. Gagal memadam pekeliling.");
     });
 }
-

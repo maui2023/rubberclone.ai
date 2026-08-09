@@ -10,7 +10,14 @@ $this->view('layouts/header', $data);
             <h2 class="panel-title">Pengurusan Pekeliling & Makluman RISDA</h2>
             <span class="panel-subtitle">Terbit, kemas kini, dan urus makluman rasmi atau pekeliling untuk dipaparkan pada aplikasi mudah alih RISDA</span>
         </div>
-        <div class="table-actions-group" style="display: flex; align-items: center; gap: 1rem;">
+        <div class="table-actions-group" style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+            <!-- Filter Status -->
+            <select id="filter-announcement-status" class="filter-select" aria-label="Tapis mengikut status">
+                <option value="">Semua Status</option>
+                <option value="active">Aktif</option>
+                <option value="inactive">Draf / Nyahaktif</option>
+            </select>
+
             <!-- Input Carian -->
             <div class="search-bar-wrapper">
                 <svg class="search-bar-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -52,6 +59,26 @@ $this->view('layouts/header', $data);
                 </tr>
             </tbody>
         </table>
+    </div>
+
+    <!-- Pagination Footer -->
+    <div class="table-pagination-footer" id="announcements-pagination">
+        <div class="pagination-info" id="announcements-pagination-info">
+            Menunjukkan 0 - 0 daripada 0 rekod
+        </div>
+        <div class="pagination-controls">
+            <label for="announcements-page-size" class="pagination-size-label">Papar:</label>
+            <select id="announcements-page-size" class="filter-select pagination-size-select">
+                <option value="10" selected>10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+            </select>
+            <div class="pagination-buttons">
+                <button class="btn-pagination" id="announcements-prev-page" title="Halaman Sebelumnya" disabled>&laquo; Sebelah</button>
+                <span class="pagination-page-indicator" id="announcements-page-indicator">Halaman 1 / 1</span>
+                <button class="btn-pagination" id="announcements-next-page" title="Halaman Seterusnya" disabled>Seterusnya &raquo;</button>
+            </div>
+        </div>
     </div>
     
 </div>

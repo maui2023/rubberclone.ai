@@ -10,7 +10,22 @@ $this->view('layouts/header', $data);
             <h2 class="panel-title">Pengurusan Sampel Klon Getah</h2>
             <span class="panel-subtitle">Tambah, sunting, dan urus data sampel klon getah untuk analisis AI pada aplikasi Flutter</span>
         </div>
-        <div class="table-actions-group" style="display: flex; align-items: center; gap: 1rem;">
+        <div class="table-actions-group" style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+            <!-- Filter Warna Lateks -->
+            <select id="filter-latex-select" class="filter-select" aria-label="Tapis mengikut warna lateks">
+                <option value="">Semua Lateks</option>
+                <option value="Putih">Putih</option>
+                <option value="Krim">Krim</option>
+                <option value="Kekuningan">Kekuningan</option>
+            </select>
+
+            <!-- Filter Status -->
+            <select id="filter-clone-status-select" class="filter-select" aria-label="Tapis mengikut status">
+                <option value="">Semua Status</option>
+                <option value="active">Aktif</option>
+                <option value="inactive">Nyahaktif</option>
+            </select>
+
             <!-- Input Carian -->
             <div class="search-bar-wrapper">
                 <svg class="search-bar-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -53,6 +68,26 @@ $this->view('layouts/header', $data);
                 </tr>
             </tbody>
         </table>
+    </div>
+
+    <!-- Pagination Footer -->
+    <div class="table-pagination-footer" id="clones-pagination">
+        <div class="pagination-info" id="clones-pagination-info">
+            Menunjukkan 0 - 0 daripada 0 rekod
+        </div>
+        <div class="pagination-controls">
+            <label for="clones-page-size" class="pagination-size-label">Papar:</label>
+            <select id="clones-page-size" class="filter-select pagination-size-select">
+                <option value="10" selected>10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+            </select>
+            <div class="pagination-buttons">
+                <button class="btn-pagination" id="clones-prev-page" title="Halaman Sebelumnya" disabled>&laquo; Sebelah</button>
+                <span class="pagination-page-indicator" id="clones-page-indicator">Halaman 1 / 1</span>
+                <button class="btn-pagination" id="clones-next-page" title="Halaman Seterusnya" disabled>Seterusnya &raquo;</button>
+            </div>
+        </div>
     </div>
     
 </div>

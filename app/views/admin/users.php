@@ -10,7 +10,21 @@ $this->view('layouts/header', $data);
             <h2 class="panel-title">Direktori Pengguna RISDA</h2>
             <span class="panel-subtitle">Sahkan peranti, urus kelulusan, kemas kini profil, dan status akses pegawai lapangan</span>
         </div>
-        <div class="table-actions-group" style="display: flex; align-items: center; gap: 1rem;">
+        <div class="table-actions-group" style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+            <!-- Filter Status -->
+            <select id="filter-user-status" class="filter-select" aria-label="Tapis mengikut status">
+                <option value="">Semua Status</option>
+                <option value="active">Aktif</option>
+                <option value="inactive">Nyahaktif</option>
+            </select>
+
+            <!-- Filter Peranan -->
+            <select id="filter-user-role" class="filter-select" aria-label="Tapis mengikut peranan">
+                <option value="">Semua Peranan</option>
+                <option value="user">Pegawai (User)</option>
+                <option value="admin">Pentadbir (Admin)</option>
+            </select>
+
             <!-- Input Carian -->
             <div class="search-bar-wrapper">
                 <svg class="search-bar-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -54,6 +68,26 @@ $this->view('layouts/header', $data);
                 </tr>
             </tbody>
         </table>
+    </div>
+
+    <!-- Pagination Footer -->
+    <div class="table-pagination-footer" id="users-pagination">
+        <div class="pagination-info" id="users-pagination-info">
+            Menunjukkan 0 - 0 daripada 0 rekod
+        </div>
+        <div class="pagination-controls">
+            <label for="users-page-size" class="pagination-size-label">Papar:</label>
+            <select id="users-page-size" class="filter-select pagination-size-select">
+                <option value="10" selected>10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+            </select>
+            <div class="pagination-buttons">
+                <button class="btn-pagination" id="users-prev-page" title="Halaman Sebelumnya" disabled>&laquo; Sebelah</button>
+                <span class="pagination-page-indicator" id="users-page-indicator">Halaman 1 / 1</span>
+                <button class="btn-pagination" id="users-next-page" title="Halaman Seterusnya" disabled>Seterusnya &raquo;</button>
+            </div>
+        </div>
     </div>
     
 </div>

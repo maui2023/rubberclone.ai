@@ -181,11 +181,13 @@ class AnalysisController extends Controller {
     public function list() {
         $user = $this->checkAuth();
 
-        // Logik: Jika admin, pulangkan SEMUA. Jika pengguna biasa, pulangkan rekod miliknya sahaja.
-        if ($user['role'] === 'admin') {
+        $userId = isset($_GET['user_id']) ? (int)$_GET['user_id'] : $user['id'];
+        
+        // Logik: Hanya pulangkan SEMUA rekod jika admin secara eksplisit meminta all=true
+        if ($user['role'] === 'admin' && isset($_GET['all']) && $_GET['all'] === 'true') {
             $records = $this->analysisModel->getAllRecords();
         } else {
-            $records = $this->analysisModel->getByUserId($user['id']);
+            $records = $this->analysisModel->getByUserId($userId);
         }
 
         if ($records === false) {

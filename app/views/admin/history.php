@@ -11,15 +11,26 @@ $this->view('layouts/header', $data);
             <span class="panel-subtitle">Audit menyeluruh semua imej daun getah yang diproses melalui Gemini AI</span>
         </div>
         
-        <div class="table-actions-group flex-wrap gap-2">
+        <div class="table-actions-group flex-wrap gap-2" style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
             <!-- Filter Klon -->
             <div class="select-wrapper">
                 <select id="filter-clone-select" class="filter-select" aria-label="Tapis mengikut klon">
                     <option value="">Semua Klon</option>
+                    <option value="PB 350">PB 350</option>
+                    <option value="PB 260">PB 260</option>
+                    <option value="RRIM 2002">RRIM 2002</option>
                     <option value="RRIM 3001">RRIM 3001</option>
                     <option value="RRIM 600">RRIM 600</option>
-                    <option value="PB 260">PB 260</option>
-                    <option value="GT 1">GT 1</option>
+                </select>
+            </div>
+
+            <!-- Filter Keyakinan AI -->
+            <div class="select-wrapper">
+                <select id="filter-confidence-select" class="filter-select" aria-label="Tapis mengikut keyakinan AI">
+                    <option value="">Semua Keyakinan</option>
+                    <option value="high">Sangat Tinggi (&ge; 90%)</option>
+                    <option value="medium">Sederhana (75% - 89%)</option>
+                    <option value="low">Rendah (&lt; 75%)</option>
                 </select>
             </div>
             
@@ -57,6 +68,26 @@ $this->view('layouts/header', $data);
                 </tr>
             </tbody>
         </table>
+    </div>
+
+    <!-- Pagination Footer -->
+    <div class="table-pagination-footer" id="history-pagination">
+        <div class="pagination-info" id="history-pagination-info">
+            Menunjukkan 0 - 0 daripada 0 rekod
+        </div>
+        <div class="pagination-controls">
+            <label for="history-page-size" class="pagination-size-label">Papar:</label>
+            <select id="history-page-size" class="filter-select pagination-size-select">
+                <option value="10" selected>10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+            </select>
+            <div class="pagination-buttons">
+                <button class="btn-pagination" id="history-prev-page" title="Halaman Sebelumnya" disabled>&laquo; Sebelah</button>
+                <span class="pagination-page-indicator" id="history-page-indicator">Halaman 1 / 1</span>
+                <button class="btn-pagination" id="history-next-page" title="Halaman Seterusnya" disabled>Seterusnya &raquo;</button>
+            </div>
+        </div>
     </div>
     
 </div>

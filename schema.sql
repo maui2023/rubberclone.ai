@@ -15,6 +15,7 @@ CREATE TABLE IF NOT EXISTS `users` (
   `agency` VARCHAR(100) DEFAULT 'RISDA Pekebun Kecil',
   `status` ENUM('active', 'inactive') DEFAULT 'active',
   `role` ENUM('user', 'admin') DEFAULT 'user',
+  `avatar_url` VARCHAR(255) DEFAULT NULL,
   `registration_date` BIGINT NOT NULL, -- Unix timestamp in milliseconds
   `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
@@ -85,3 +86,22 @@ INSERT INTO `clone_samples` (`clone_name`, `warisan`, `potensi_hasil`, `anggaran
 ('PB 350', 'RRIM 600 × PB 235', '2,765', '19T/1.6', 'Bulat (rounded)', 'Kuspidat (Cuspidate)', 'Bulat (Obtuse)', 'Bersentuh ke bertindih', 'Gelombang', 'Hijau tua, sedikit berkilat', 'Licin', 'Rata/Selanjar', 'Rata', 'Sederhana panjang, rata', 'Pendek dan rata', 'Putih'),
 ('PB 260', 'PB5/51 × PB49', '2,675', '1.29/pokok', 'Bujur telur (Obovate) ke Bujur sama (Elliptical)', 'Akuminat (Accuminate)', 'Baji/Tirus (Cuneate)', 'Terpisah ke Bersentuhan', 'Keriting', 'Hijau muda/kekuningan, sedikit berkilat', 'Kasar', 'Menurun', 'Bentuk perahu (boat shape)', 'Sederhana panjang dan rata', 'Sederhana panjang dan menurun', 'Krim'),
 ('RRIM 2002', 'PB 5/51 × FORD 351', '2,348', '17Th/1.10', 'Bujur sama (Elliptical)', 'Akuminat (Acuminate)', 'Bulat (Obtuse)', 'Bersentuhan ke bertindih', 'Licin', 'Hijau muda, sedikit berkilat', 'Licin', 'Rata/Selanjar', 'Bentuk perahu (boat shape)', 'Sederhana panjang, rata', 'Pendek, rata', 'Kekuningan (yellowish)');
+
+-- 6. Table: announcements (Pekeliling & Makluman RISDA)
+CREATE TABLE IF NOT EXISTS `announcements` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `title` VARCHAR(255) NOT NULL,
+  `content` TEXT NOT NULL,
+  `publish_at` BIGINT NOT NULL,   -- Unix timestamp in milliseconds
+  `expires_at` BIGINT DEFAULT NULL, -- Unix timestamp in milliseconds (NULL = no expiration)
+  `status` ENUM('active', 'inactive') DEFAULT 'active',
+  `author` VARCHAR(100) DEFAULT 'RISDA Pentadbir',
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- 6.1 Seed Data: Pekeliling RISDA (Semasa & Berjadual)
+INSERT INTO `announcements` (`title`, `content`, `publish_at`, `expires_at`, `status`) VALUES
+('MAKLUMAN INTENSIF BAJA GETAH RISDA 2026', 'Bantuan Skim Baja RISDA 2026 kini dibuka untuk permohonan berskala besar di seluruh Semenanjung Malaysia. Pastikan klon getah yang ditanam berdaftar.', 1700000000000, 2085000000000, 'active'),
+('PEKELILING PENGAGIHAN BENIH KLON PB 350 & PB 260', 'RISDA mengumumkan pengagihan benih klon getah PB 350 dan PB 260 bersubsidi untuk zon utara mulai bulan ini.', 1700000000000, 2085000000000, 'active');
+

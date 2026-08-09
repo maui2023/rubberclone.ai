@@ -102,8 +102,16 @@ class User {
             $stmt->bindParam(':status', $status);
             $stmt->bindParam(':id', $id);
             return $stmt->execute();
+    // Mengemas kini gambar profil pengguna
+    public function updateAvatarUrl($id, $avatarUrl) {
+        $query = "UPDATE " . $this->table . " SET avatar_url = :avatar_url WHERE id = :id";
+        try {
+            $stmt = $this->db->prepare($query);
+            $stmt->bindParam(':avatar_url', $avatarUrl);
+            $stmt->bindParam(':id', $id);
+            return $stmt->execute();
         } catch (PDOException $e) {
-            error_log("Error updating user status: " . $e->getMessage());
+            error_log("Error updating user avatar: " . $e->getMessage());
             return false;
         }
     }

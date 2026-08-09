@@ -69,8 +69,47 @@ class AuthController extends Controller {
                 "fullname" => $user['fullname'],
                 "agency" => $user['agency'],
                 "role" => $user['role'],
-                "status" => $user['status']
+                "status" => $user['status'],
+                "avatar_url" => $user['avatar_url'] ?? null
             ]
         ], 200);
+    }
+
+    // Muat naik Gambar Profil Pengguna (POST /api/auth/upload-avatar)
+    public function uploadAvatar() {
+        $token = JWT::getBearerToken();
+        $userPayload = null;
+        if ($token) {
+            $userPayload = JWT::verify($token);
+        }
+
+        $userId = $userPayload['id'] ?? $_POST['user_id'] ?? 1;
+
+        if (!isset($_FILES['avatar']) || $_FILES['avatar']['error'] !== UPLOAD_ERR_OK) {
+            $this->jsonResponse(["status" => "error", "message" => "Fail gambar avatar wajib diunggah."], 400);
+        }
+
+        $fileTmpPath = $_FILES['avatar']['tmp_name'];
+        $fileName = 'avatar_' . $userId . '_' . time() . '.jpg';
+        
+        $uploadDir = __DIR__ . '/../../public/uploads/avatars/';
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0755, true);
+        }
+
+        $destPath = $uploadDir . $fileName;
+
+        if (move_uploaded_file($fileTmpPath, $destPath)) {
+            $avatarUrl = '/uploads/avatars/' . $fileName;
+            $this->userModel->updateAvatarUrl($userId, $avatarUrl);
+
+            $this->jsonResponse([
+                "status" => "success",
+                "message" => "Gambar profil berjaya dikemas kini.",
+                "avatar_url" => $avatarUrl
+            ], 200);
+        } else {
+            $this->jsonResponse(["status" => "error", "message" => "Gagal menyimpan gambar di pelayan."], 500);
+        }
     }
 }

@@ -140,6 +140,15 @@ class AdminController extends Controller {
         ]);
     }
 
+    // Paparan Halaman Pengurusan Sampel Klon (GET /admin/clone-samples)
+    public function cloneSamplesView() {
+        $this->checkWebAuth();
+        $this->view('admin/clone_samples', [
+            'title' => 'Pengurusan Sampel Klon - Rubber Clone AI',
+            'active_tab' => 'clone_samples'
+        ]);
+    }
+
     // --- API PENTADBIRAN (ADMIN API ENDPOINTS) ---
 
     // Dapatkan data senarai pengguna (GET /api/admin/users)

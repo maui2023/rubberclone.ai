@@ -62,6 +62,16 @@ $active_tab = $active_tab ?? 'dashboard';
                     Rekod Imbasan
                 </a>
 
+                <a href="<?php echo route('admin/clone-samples'); ?>" class="menu-item <?php echo $active_tab === 'clone_samples' ? 'active' : ''; ?>">
+                    <!-- Leaf/Seedling Icon SVG -->
+                    <svg class="menu-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M17 8c.7-1 1-2.2 1-3.5C18 2.5 16.6 1 14.8 1c-1 0-1.8.5-2.4 1.3A4.2 4.2 0 0 0 8 1C6.3 1 5 2.5 5 4.5 5 5.8 5.3 7 6 8"></path>
+                        <path d="M12 1v16"></path>
+                        <path d="M5 12H2a10 10 0 0 0 20 0h-3"></path>
+                    </svg>
+                    Sampel Klon
+                </a>
+
                 <a href="<?php echo route('admin/cms'); ?>" class="menu-item <?php echo $active_tab === 'cms' ? 'active' : ''; ?>">
                     <!-- Settings/Edit Icon SVG -->
                     <svg class="menu-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">

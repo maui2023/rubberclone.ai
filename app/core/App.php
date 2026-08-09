@@ -46,6 +46,7 @@ class App {
             'pentadbir'             => ['AdminController', 'dashboard', 'GET'],
             'admin/users'           => ['AdminController', 'usersView', 'GET'],
             'admin/history'         => ['AdminController', 'historyView', 'GET'],
+            'admin/clone-samples'   => ['AdminController', 'cloneSamplesView', 'GET'],
             'admin/cms'             => ['AdminController', 'cmsView', 'GET'],
             'admin/loginWeb'        => ['AdminController', 'loginWeb', 'POST'],
             'admin/logoutWeb'       => ['AdminController', 'logoutWeb', 'GET']

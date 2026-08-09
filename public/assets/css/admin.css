@@ -905,3 +905,41 @@ input:checked + .slider:before {
     background: var(--color-emerald-hover) !important;
     transform: translateY(-1px);
 }
+
+/* --- STYLES FOR CLONE SAMPLES --- */
+.btn-action-edit:hover {
+    color: var(--color-emerald) !important;
+    background: rgba(16, 185, 129, 0.08) !important;
+    border-color: rgba(16, 185, 129, 0.15) !important;
+}
+
+#clone-modal input:focus {
+    outline: none;
+    border-color: var(--color-emerald) !important;
+    box-shadow: 0 0 10px var(--color-emerald-glow) !important;
+}
+
+#btn-close-clone-modal:hover {
+    color: var(--color-emerald) !important;
+}
+
+#btn-add-clone:hover {
+    background: var(--color-emerald-hover) !important;
+    transform: translateY(-1px);
+}
+
+#search-clones-input {
+    width: 100%;
+    padding: 0.6rem 1rem 0.6rem 2.25rem;
+    background: rgba(7, 14, 11, 0.5);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-sm);
+    color: var(--color-text-primary);
+    font-size: 0.85rem;
+    transition: var(--transition-smooth);
+}
+
+#search-clones-input:focus {
+    outline: none;
+    border-color: var(--color-emerald);
+}

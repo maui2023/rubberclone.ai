@@ -33,6 +33,11 @@ document.addEventListener("DOMContentLoaded", function () {
     if (document.getElementById("cms-settings-form")) {
         initCmsManagement();
     }
+
+    // 5. Logik Pengurusan Sampel Klon (Clone Samples Management)
+    if (document.getElementById("clones-data-table")) {
+        initCloneSamples();
+    }
 });
 
 // --- 1. LOGIK PAPAN PEMUKA ---
@@ -707,4 +712,298 @@ function escapeHtml(text) {
         "'": '&#039;'
     };
     return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+}
+
+// --- 5. LOGIK PENGURUSAN SAMPEL KLON ---
+let allClones = [];
+
+function initCloneSamples() {
+    const tableBody = document.getElementById('clones-table-body');
+    const searchInput = document.getElementById('search-clones-input');
+    const modal = document.getElementById('clone-modal');
+    const detailModal = document.getElementById('clone-detail-modal');
+    const btnAddClone = document.getElementById('btn-add-clone');
+    const btnCloseModal = document.getElementById('btn-close-clone-modal');
+    const closeDetailBtn = document.getElementById('close-detail-modal-btn');
+    const cloneForm = document.getElementById('clone-form');
+    const errorDiv = document.getElementById('clone-form-error');
+    const btnSubmit = document.getElementById('btn-submit-clone');
+    const modalTitle = document.getElementById('clone-modal-title');
+    const editIdField = document.getElementById('clone-edit-id');
+
+    // Mengambil data senarai sampel klon secara dinamik
+    function fetchAndRenderClones() {
+        tableBody.innerHTML = `<tr><td colspan="7" class="table-loading-row"><span class="spinner"></span> Memuatkan data sampel klon getah...</td></tr>`;
+        fetch(getApiUrl('api/clone-samples/list'))
+            .then(response => response.json())
+            .then(res => {
+                if (res.status === 'success') {
+                    allClones = res.data;
+                    renderClonesTable(allClones);
+                } else {
+                    allClones = [];
+                    tableBody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:#ef4444;">${res.message}</td></tr>`;
+                }
+            })
+            .catch(err => {
+                allClones = [];
+                tableBody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:#ef4444;">Ralat sambungan pelayan. Sila semak konfigurasi pangkalan data.</td></tr>`;
+            });
+    }
+
+    fetchAndRenderClones();
+
+    // Carian klon masa nyata
+    searchInput.addEventListener('input', function () {
+        const query = searchInput.value.toLowerCase();
+        const filtered = allClones.filter(clone =>
+            clone.clone_name.toLowerCase().includes(query) ||
+            (clone.warisan && clone.warisan.toLowerCase().includes(query)) ||
+            (clone.bentuk_daun && clone.bentuk_daun.toLowerCase().includes(query)) ||
+            (clone.warna_lateks && clone.warna_lateks.toLowerCase().includes(query))
+        );
+        renderClonesTable(filtered);
+    });
+
+    // Urus Modal Tunjuk/Sembunyi — Tambah Klon
+    if (btnAddClone && modal) {
+        btnAddClone.addEventListener('click', () => {
+            modalTitle.innerText = 'Tambah Klon Baharu';
+            btnSubmit.innerText = 'Simpan Klon';
+            editIdField.value = '';
+            errorDiv.style.display = 'none';
+            cloneForm.reset();
+            modal.style.display = 'flex';
+        });
+    }
+
+    if (btnCloseModal && modal) {
+        btnCloseModal.addEventListener('click', () => {
+            modal.style.display = 'none';
+        });
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
+    }
+
+    // Tutup modal detail
+    if (closeDetailBtn && detailModal) {
+        closeDetailBtn.addEventListener('click', () => detailModal.style.display = 'none');
+        detailModal.addEventListener('click', (e) => {
+            if (e.target === detailModal) detailModal.style.display = 'none';
+        });
+    }
+
+    // Urus Hantar Borang (Tambah / Kemaskini)
+    if (cloneForm) {
+        cloneForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const editId = editIdField.value;
+            const isEdit = editId !== '';
+
+            const formData = {
+                clone_name: document.getElementById('clone-name').value,
+                warisan: document.getElementById('clone-warisan').value,
+                potensi_hasil: document.getElementById('clone-potensi').value,
+                anggaran_kayu: document.getElementById('clone-kayu').value,
+                bentuk_daun: document.getElementById('clone-bentuk-daun').value,
+                bentuk_hujung_daun: document.getElementById('clone-hujung-daun').value,
+                bentuk_pangkal_daun: document.getElementById('clone-pangkal-daun').value,
+                kedudukan_lai_daun: document.getElementById('clone-lai-daun').value,
+                bentuk_tepi_daun: document.getElementById('clone-tepi-daun').value,
+                warna_daun_kilauan: document.getElementById('clone-warna-daun').value,
+                permukaan_daun: document.getElementById('clone-permukaan').value,
+                pandangan_memanjang: document.getElementById('clone-memanjang').value,
+                pandangan_melintang: document.getElementById('clone-melintang').value,
+                saiz_gagang_daun: document.getElementById('clone-gagang').value,
+                saiz_anak_gagang: document.getElementById('clone-anak-gagang').value,
+                warna_lateks: document.getElementById('clone-lateks').value
+            };
+
+            if (isEdit) {
+                formData.id = parseInt(editId);
+            }
+
+            errorDiv.style.display = 'none';
+            btnSubmit.disabled = true;
+            btnSubmit.innerHTML = isEdit ? 'Mengemaskini...' : 'Menyimpan...';
+
+            const apiPath = isEdit ? 'api/clone-samples/update' : 'api/clone-samples/create';
+
+            fetch(getApiUrl(apiPath), {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => response.json())
+            .then(res => {
+                btnSubmit.disabled = false;
+                btnSubmit.innerHTML = isEdit ? 'Kemas Kini Klon' : 'Simpan Klon';
+
+                if (res.status === 'success') {
+                    modal.style.display = 'none';
+                    cloneForm.reset();
+                    editIdField.value = '';
+                    fetchAndRenderClones();
+                } else {
+                    errorDiv.innerText = res.message || 'Ralat tidak diketahui.';
+                    errorDiv.style.display = 'block';
+                }
+            })
+            .catch(err => {
+                btnSubmit.disabled = false;
+                btnSubmit.innerHTML = isEdit ? 'Kemas Kini Klon' : 'Simpan Klon';
+                errorDiv.innerText = 'Ralat sambungan pelayan. Gagal menyimpan data.';
+                errorDiv.style.display = 'block';
+            });
+        });
+    }
+}
+
+function renderClonesTable(clonesList) {
+    const tableBody = document.getElementById('clones-table-body');
+
+    if (clonesList.length === 0) {
+        tableBody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding: 2rem;">Tiada sampel klon ditemui. Klik "Tambah Klon" untuk memulakan.</td></tr>`;
+        return;
+    }
+
+    tableBody.innerHTML = '';
+    clonesList.forEach(clone => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td style="font-weight:600; color:var(--color-gold-latex); cursor:pointer;" onclick="viewCloneDetail(${clone.id})" title="Klik untuk lihat butiran penuh">${escapeHtml(clone.clone_name)}</td>
+            <td style="font-size:0.85rem;">${escapeHtml(clone.warisan || '-')}</td>
+            <td style="font-weight:600; color:var(--color-emerald);">${escapeHtml(clone.potensi_hasil || '-')} <span style="color:var(--color-text-muted); font-weight:400; font-size:0.75rem;">kg/ha/th</span></td>
+            <td style="font-size:0.85rem; max-width:180px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${escapeHtml(clone.bentuk_daun || '')}">${escapeHtml(clone.bentuk_daun || '-')}</td>
+            <td>${escapeHtml(clone.warna_lateks || '-')}</td>
+            <td>
+                <span class="status-badge active">Aktif</span>
+            </td>
+            <td>
+                <div style="display:flex; gap:0.5rem;">
+                    <button class="btn-action-edit" title="Sunting Klon" onclick="editClone(${clone.id})" style="padding: 0.4rem; border-radius: var(--radius-sm); color: var(--color-text-muted); display: inline-flex; align-items: center; justify-content: center; transition: var(--transition-smooth); border: 1px solid transparent; background: none; cursor: pointer;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                            <path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                        </svg>
+                    </button>
+                    <button class="btn-action-delete" title="Padam Klon" onclick="deleteClone(${clone.id}, '${escapeHtml(clone.clone_name)}')">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="3 6 5 6 21 6"></polyline>
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                            <line x1="10" y1="11" x2="10" y2="17"></line>
+                            <line x1="14" y1="11" x2="14" y2="17"></line>
+                        </svg>
+                    </button>
+                </div>
+            </td>
+        `;
+        tableBody.appendChild(tr);
+    });
+}
+
+// Melihat butiran penuh klon dalam modal
+function viewCloneDetail(cloneId) {
+    const clone = allClones.find(c => c.id === cloneId);
+    if (!clone) return;
+
+    const detailModal = document.getElementById('clone-detail-modal');
+    const titleEl = document.getElementById('detail-clone-title');
+    const bodyEl = document.getElementById('detail-clone-body');
+
+    titleEl.innerText = `Ciri-Ciri ${clone.clone_name}`;
+
+    const fields = [
+        ['Nama Klon', clone.clone_name],
+        ['Warisan', clone.warisan],
+        ['Potensi Hasil (kg/ha/th)', clone.potensi_hasil],
+        ['Anggaran Hasil Kayu', clone.anggaran_kayu],
+        ['Bentuk Daun', clone.bentuk_daun],
+        ['Bentuk Hujung Daun', clone.bentuk_hujung_daun],
+        ['Bentuk Pangkal Daun', clone.bentuk_pangkal_daun],
+        ['Kedudukan Lai Daun', clone.kedudukan_lai_daun],
+        ['Bentuk Tepi Daun', clone.bentuk_tepi_daun],
+        ['Warna Daun & Kilauan', clone.warna_daun_kilauan],
+        ['Permukaan Daun', clone.permukaan_daun],
+        ['Pandangan Memanjang', clone.pandangan_memanjang],
+        ['Pandangan Melintang', clone.pandangan_melintang],
+        ['Saiz Gagang Daun', clone.saiz_gagang_daun],
+        ['Saiz Anak Gagang', clone.saiz_anak_gagang],
+        ['Warna Lateks', clone.warna_lateks]
+    ];
+
+    bodyEl.innerHTML = fields.map(([label, value]) => `
+        <div class="modal-field">
+            <span class="modal-field-label">${label}</span>
+            <span class="modal-field-val">${escapeHtml(value || 'Tiada Maklumat')}</span>
+        </div>
+    `).join('');
+
+    detailModal.style.display = 'flex';
+}
+
+// Membuka modal sunting klon dengan data sedia ada
+function editClone(cloneId) {
+    const clone = allClones.find(c => c.id === cloneId);
+    if (!clone) return;
+
+    const modal = document.getElementById('clone-modal');
+    const modalTitle = document.getElementById('clone-modal-title');
+    const btnSubmit = document.getElementById('btn-submit-clone');
+    const editIdField = document.getElementById('clone-edit-id');
+    const errorDiv = document.getElementById('clone-form-error');
+
+    modalTitle.innerText = `Sunting Klon: ${clone.clone_name}`;
+    btnSubmit.innerText = 'Kemas Kini Klon';
+    editIdField.value = clone.id;
+    errorDiv.style.display = 'none';
+
+    // Isi borang dengan data sedia ada
+    document.getElementById('clone-name').value = clone.clone_name || '';
+    document.getElementById('clone-warisan').value = clone.warisan || '';
+    document.getElementById('clone-potensi').value = clone.potensi_hasil || '';
+    document.getElementById('clone-kayu').value = clone.anggaran_kayu || '';
+    document.getElementById('clone-bentuk-daun').value = clone.bentuk_daun || '';
+    document.getElementById('clone-hujung-daun').value = clone.bentuk_hujung_daun || '';
+    document.getElementById('clone-pangkal-daun').value = clone.bentuk_pangkal_daun || '';
+    document.getElementById('clone-lai-daun').value = clone.kedudukan_lai_daun || '';
+    document.getElementById('clone-tepi-daun').value = clone.bentuk_tepi_daun || '';
+    document.getElementById('clone-warna-daun').value = clone.warna_daun_kilauan || '';
+    document.getElementById('clone-permukaan').value = clone.permukaan_daun || '';
+    document.getElementById('clone-memanjang').value = clone.pandangan_memanjang || '';
+    document.getElementById('clone-melintang').value = clone.pandangan_melintang || '';
+    document.getElementById('clone-gagang').value = clone.saiz_gagang_daun || '';
+    document.getElementById('clone-anak-gagang').value = clone.saiz_anak_gagang || '';
+    document.getElementById('clone-lateks').value = clone.warna_lateks || '';
+
+    modal.style.display = 'flex';
+}
+
+// Memadam sampel klon
+function deleteClone(cloneId, cloneName) {
+    if (!confirm(`Adakah anda pasti mahu memadamkan sampel klon "${cloneName}" daripada sistem? Tindakan ini tidak boleh ditarik balik.`)) {
+        return;
+    }
+
+    fetch(getApiUrl(`api/clone-samples/delete?id=${cloneId}`), {
+        method: 'DELETE'
+    })
+    .then(response => response.json())
+    .then(res => {
+        if (res.status === 'success') {
+            allClones = allClones.filter(c => c.id !== cloneId);
+            renderClonesTable(allClones);
+        } else {
+            alert("Ralat: " + res.message);
+        }
+    })
+    .catch(err => {
+        alert("Ralat sambungan pelayan. Gagal memadam sampel klon.");
+    });
 }
